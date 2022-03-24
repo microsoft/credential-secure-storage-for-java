@@ -3,5 +3,8 @@
 
 package com.microsoft.a4o.credentialstorage.secret;
 
-public abstract class Secret {
+/**
+ * An interface representing a secret.
+ */
+public interface Secret {
 }

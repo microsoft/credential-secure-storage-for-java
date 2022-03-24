@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See License.txt in the project root.
 
-package com.microsoft.a4o.credentialstorage.helpers;
+package com.microsoft.a4o.credentialstorage.storage.posix;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -15,7 +15,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 
-public class XmlHelper {
+class XmlHelper {
     // Adapted from http://docs.oracle.com/javase/tutorial/jaxp/dom/readingXML.html
     public static String getText(final Node node) {
         final StringBuilder result = new StringBuilder();
@@ -50,8 +50,7 @@ public class XmlHelper {
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             transformer.transform(new DOMSource(document), new StreamResult(baos));
 
-            final String result = baos.toString();
-            return result;
+            return baos.toString();
         } catch (final TransformerException e) {
             throw new Error(e);
         }

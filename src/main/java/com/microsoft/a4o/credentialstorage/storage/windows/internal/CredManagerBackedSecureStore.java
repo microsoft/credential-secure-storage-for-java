@@ -95,7 +95,7 @@ public abstract class CredManagerBackedSecureStore<E extends Secret> implements 
             }
 
         } catch (final LastErrorException e) {
-            logger.error("Getting secret failed.", e);
+            logger.error("Getting secret failed. {}", e.getMessage());
             cred = null;
 
         } finally {
@@ -131,7 +131,7 @@ public abstract class CredManagerBackedSecureStore<E extends Secret> implements 
                 return INSTANCE.CredDelete(key, CredAdvapi32.CRED_TYPE_GENERIC, 0);
             }
         } catch (LastErrorException e) {
-            logger.error("Deleting secret failed.", e);
+            logger.error("Deleting secret failed. {}", e.getMessage());
             return false;
         }
     }
@@ -169,7 +169,7 @@ public abstract class CredManagerBackedSecureStore<E extends Secret> implements 
             return true;
         }
         catch (LastErrorException e) {
-            logger.error("Adding secret failed.", e);
+            logger.error("Adding secret failed. {}", e.getMessage());
             return false;
         } finally {
             cred.CredentialBlob.clear(credBlob.length);

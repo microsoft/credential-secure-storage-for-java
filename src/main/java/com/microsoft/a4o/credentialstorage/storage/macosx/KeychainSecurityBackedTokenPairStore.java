@@ -34,5 +34,4 @@ public class KeychainSecurityBackedTokenPairStore extends KeychainSecurityCliSto
     public boolean isSecure() {
         return true;
     }
-
 }
