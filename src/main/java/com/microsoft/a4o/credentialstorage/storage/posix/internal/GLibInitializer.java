@@ -28,7 +28,7 @@ public class GLibInitializer {
 
     public synchronized void initialize() {
         if (!glibInitialized) {
-            GLIB_INSTANCE.g_set_application_name("Visual Studio Team Services");
+            GLIB_INSTANCE.g_set_application_name("Credential Secure Storage");
             glibInitialized = true;
         }
     }

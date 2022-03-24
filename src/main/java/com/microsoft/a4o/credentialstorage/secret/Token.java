@@ -11,22 +11,11 @@ import java.util.UUID;
 /**
  * A security token, usually acquired by some authentication and identity services.
  */
-public class Token extends Secret {
+public final class Token implements Secret {
     private static final UUID EMPTY_UUID = new UUID(0, 0);
 
-    /**
-     * The type of the security token.
-     */
     private final TokenType type;
-
-    /**
-     * The raw contents of the token.
-     */
     private final String value;
-
-    /**
-     * The target identity for the security token.
-     */
     private final UUID targetIdentity;
 
     public Token(final String value, final TokenType type, final UUID targetIdentity) {
@@ -45,14 +34,23 @@ public class Token extends Secret {
         this(value, type, EMPTY_UUID);
     }
 
+    /**
+     * The type of the security token.
+     */
     public TokenType getType() {
         return type;
     }
 
+    /**
+     * The raw contents of the token.
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * The target identity for the security token.
+     */
     public UUID getTargetIdentity() {
         return targetIdentity;
     }
@@ -76,16 +74,6 @@ public class Token extends Secret {
     @Override
     public int hashCode() {
         return type.ordinal() * value.hashCode();
-    }
-
-    public static void validate(final Token token) {
-        if (token == null)
-            throw new IllegalArgumentException("The `token` parameter is null or invalid.");
-        if (StringHelper.isNullOrWhiteSpace(token.value))
-            throw new IllegalArgumentException("The value of the `token` cannot be null or empty.");
-        if (token.value.length() > Credential.PASSWORD_MAX_LENGTH)
-            throw new IllegalArgumentException(String.format("The value of the `token` cannot be longer than %1$d " +
-                    "characters.", Credential.PASSWORD_MAX_LENGTH));
     }
 
     /**

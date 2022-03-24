@@ -34,5 +34,4 @@ public class KeychainSecurityBackedCredentialStore extends KeychainSecurityCliSt
     public boolean isSecure() {
         return true;
     }
-
 }

@@ -8,6 +8,8 @@ import com.microsoft.a4o.credentialstorage.secret.TokenType;
 import com.microsoft.a4o.credentialstorage.storage.SecretStore;
 import com.microsoft.a4o.credentialstorage.storage.StorageProvider;
 import com.microsoft.a4o.credentialstorage.storage.StorageProvider.SecureOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,53 +19,59 @@ public class AppToken {
     private static final String TOKEN_KEY = "TestToken";
     private static final BufferedReader INPUT = new BufferedReader(new InputStreamReader(System.in));
 
-    public static void main(String[] args) throws IOException {
+    private static final Logger log = LoggerFactory.getLogger(AppToken.class);
+
+    public static void main(final String[] args) throws IOException {
         // Get a secure store instance
         final SecretStore<Token> tokenStorage = StorageProvider.getTokenStorage(true, SecureOption.MUST);
 
+        if (tokenStorage == null) {
+            log.error("No secure token storage available.");
+            return;
+        }
+
         // Get token name from the user
-        String tokenName = getTokenName();
+        final String tokenName = getTokenName();
 
         // Retrieve the existing token from the store
-        Token storedToken = tokenStorage.get(tokenName);
+        final Token storedToken = tokenStorage.get(tokenName);
         printToken(tokenName, storedToken);
 
         // Create a new token instance from user input
-        System.out.println("Enter token value: ");
-        String tokenValue = INPUT.readLine();
-        Token token = new Token(tokenValue, TokenType.Personal);
+        log.info("Enter token value: ");
+        final String tokenValue = INPUT.readLine();
+        final Token token = new Token(tokenValue, TokenType.Personal);
 
         // Save the token to the store
         tokenStorage.add(tokenName, token);
 
-        System.out.println("Added/Updated token under the key: " + tokenName);
-        System.out.println();
+        log.info("Added/Updated token under the key: {}", tokenName);
 
         // Retrieve new token from the store
         Token newStoredToken = tokenStorage.get(tokenName);
 
-        System.out.println("Retrieved the updated token using the key: " + tokenName);
+        log.info("Retrieved the updated token using the key: {}", tokenName);
         printToken(tokenName, newStoredToken);
 
         // Remove token from the store
-        System.out.println("Remove the token under the key " + tokenName + " [Y/n]?");
-        if (!"n".equalsIgnoreCase(INPUT.readLine())) {
+        log.info("Remove the token under the key {} [Y/n]?", tokenName);
+        final String userInput = INPUT.readLine();
+        if (!"n".equalsIgnoreCase(userInput)) {
             tokenStorage.delete(tokenName);
         }
     }
 
-    private static void printToken(String tokenName, Token storedToken) {
-        if (storedToken != null) {
-            System.out.println("Retrieved the existing token using the key: " + tokenName);
-            System.out.println("  Token: " + storedToken.getValue() + " (Type: " + storedToken.getType() + ")");
+    private static void printToken(final String tokenName, final Token token) {
+        if (token != null) {
+            log.info("Retrieved the existing token using the key: {}", tokenName);
+            log.info("  Token: {} (Type: {})", token.getValue(), token.getType());
         } else {
-            System.out.println("No stored token under the key: " + tokenName);
+            log.info("No stored token under the key: {}", tokenName);
         }
-        System.out.println();
     }
 
     private static String getTokenName() throws IOException {
-        System.out.print("Enter token name [" + TOKEN_KEY + "]: ");
+        log.info("Enter token name [{}]: ", TOKEN_KEY);
         String tokenName = INPUT.readLine();
         if (tokenName == null || tokenName.isEmpty()) tokenName = TOKEN_KEY;
         return tokenName;

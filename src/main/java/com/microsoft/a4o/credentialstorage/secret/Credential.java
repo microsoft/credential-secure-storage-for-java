@@ -10,10 +10,7 @@ import java.util.Objects;
 /**
  * Credential for user authentication.
  */
-public final class Credential extends Secret {
-    public static final int USERNAME_MAX_LENGTH = 511;
-    public static final int PASSWORD_MAX_LENGTH = 2047;
-
+public final class Credential implements Secret {
     private final String username;
     private final String password;
 
@@ -72,17 +69,6 @@ public final class Credential extends Secret {
     @Override
     public int hashCode() {
         return username.hashCode() + 7 * password.hashCode();
-    }
-
-    public static void validate(final Credential credentials) {
-        if (credentials == null)
-            throw new IllegalArgumentException("The credentials parameter cannot be null");
-        if (credentials.password.length() > PASSWORD_MAX_LENGTH)
-            throw new IllegalArgumentException(String.format("The Password field of the credentials parameter cannot " +
-                    "be longer than %1$d characters.", PASSWORD_MAX_LENGTH));
-        if (credentials.username.length() > USERNAME_MAX_LENGTH)
-            throw new IllegalArgumentException(String.format("The Username field of the credentials parameter cannot " +
-                    "be longer than %1$d characters.", USERNAME_MAX_LENGTH));
     }
 
     /**

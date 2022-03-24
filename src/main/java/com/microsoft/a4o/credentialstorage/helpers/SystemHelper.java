@@ -6,9 +6,11 @@ package com.microsoft.a4o.credentialstorage.helpers;
 /**
  * System utilities
  */
-public class SystemHelper {
+public final class SystemHelper {
+    private final static String osName = System.getProperty("os.name");
 
-    final static String osName = System.getProperty("os.name");
+    private SystemHelper() {
+    }
 
     /**
      * Check if the process is running on Windows platform
