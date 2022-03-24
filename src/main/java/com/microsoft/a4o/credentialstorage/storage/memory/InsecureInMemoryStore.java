@@ -1,9 +1,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See License.txt in the project root.
 
-package com.microsoft.a4o.credentialstorage.storage;
+package com.microsoft.a4o.credentialstorage.storage.memory;
 
 import com.microsoft.a4o.credentialstorage.secret.Secret;
+import com.microsoft.a4o.credentialstorage.storage.SecretStore;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

@@ -8,20 +8,9 @@ import com.microsoft.a4o.credentialstorage.helpers.StringHelper;
 import java.util.Collections;
 import java.util.Map;
 
-public class TokenPair extends Secret {
-    /**
-     * Access token, used to grant access to resources.
-     */
+public class TokenPair implements Secret {
     private final Token accessToken;
-
-    /**
-     * Refresh token, used to grant new access tokens.
-     */
     private final Token refreshToken;
-
-    /**
-     * Additional token parameters.
-     */
     private final Map<String, String> parameters;
 
     /**
@@ -43,14 +32,23 @@ public class TokenPair extends Secret {
         this.parameters = Collections.emptyMap();
     }
 
+    /**
+     * Access token, used to grant access to resources.
+     */
     public Token getAccessToken() {
         return accessToken;
     }
 
+    /**
+     * Refresh token, used to grant new access tokens.
+     */
     public Token getRefreshToken() {
         return refreshToken;
     }
 
+    /**
+     * Additional token parameters.
+     */
     public Map<String, String> getParameters() {
         return parameters;
     }

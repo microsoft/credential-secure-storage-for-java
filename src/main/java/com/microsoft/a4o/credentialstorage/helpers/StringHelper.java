@@ -8,12 +8,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class StringHelper {
+public final class StringHelper {
+    public static final String Empty = "";
+
     private static final Charset UTF8 = StandardCharsets.UTF_8;
 
     private static final Charset UTF16LE = StandardCharsets.UTF_16LE;
 
-    public static final String Empty = "";
+    private StringHelper() {
+    }
 
     public static boolean isNullOrWhiteSpace(final String s) {
         return null == s || (s.trim().length() == 0);

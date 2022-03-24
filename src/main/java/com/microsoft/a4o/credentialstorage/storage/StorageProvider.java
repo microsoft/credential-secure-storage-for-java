@@ -11,6 +11,7 @@ import com.microsoft.a4o.credentialstorage.secret.TokenPair;
 import com.microsoft.a4o.credentialstorage.storage.macosx.KeychainSecurityBackedCredentialStore;
 import com.microsoft.a4o.credentialstorage.storage.macosx.KeychainSecurityBackedTokenPairStore;
 import com.microsoft.a4o.credentialstorage.storage.macosx.KeychainSecurityBackedTokenStore;
+import com.microsoft.a4o.credentialstorage.storage.memory.InsecureInMemoryStore;
 import com.microsoft.a4o.credentialstorage.storage.posix.GnomeKeyringBackedCredentialStore;
 import com.microsoft.a4o.credentialstorage.storage.posix.GnomeKeyringBackedTokenPairStore;
 import com.microsoft.a4o.credentialstorage.storage.posix.GnomeKeyringBackedTokenStore;
@@ -25,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Returns a store for credential, token or token pair for the requested security level..
+ */
 public class StorageProvider {
 
     private static final Logger logger  = LoggerFactory.getLogger(StorageProvider.class);
@@ -79,6 +83,13 @@ public class StorageProvider {
         PERSISTED_CREDENTIAL_STORE_CANDIDATES = credentialStoreCandidates;
     }
 
+    /**
+     * Returns a token store for the specific requirements.
+     *
+     * @param persist true for persistent storage
+     * @param secureOption secure or non-secure storage
+     * @return store
+     */
     public static SecretStore<Token> getTokenStorage(final boolean persist, final SecureOption secureOption) {
         Objects.requireNonNull(secureOption, "secureOption cannot be null");
 
@@ -101,6 +112,13 @@ public class StorageProvider {
         return getStore(persist, secureOption, PERSISTED_TOKEN_STORE_CANDIDATES, inMemoryStoreGenerator);
     }
 
+    /**
+     * Returns a token pair store for the specific requirements.
+     *
+     * @param persist true for persistent storage
+     * @param secureOption secure or non-secure storage
+     * @return store
+     */
     public static SecretStore<TokenPair> getTokenPairStorage(final boolean persist, final SecureOption secureOption) {
         Objects.requireNonNull(secureOption, "secureOption cannot be null");
 
@@ -123,6 +141,13 @@ public class StorageProvider {
         return getStore(persist, secureOption, PERSISTED_TOKENPAIR_STORE_CANDIDATES, inMemoryStoreGenerator);
     }
 
+    /**
+     * Returns a credential store for the specific requirements.
+     *
+     * @param persist true for persistent storage
+     * @param secureOption secure or non-secure storage
+     * @return store
+     */
     public static SecretStore<Credential> getCredentialStorage(final boolean persist, final SecureOption secureOption) {
         Objects.requireNonNull(secureOption, "secureOption cannot be null");
 

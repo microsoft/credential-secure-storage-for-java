@@ -4,7 +4,6 @@
 package com.microsoft.a4o.credentialstorage.storage.posix;
 
 import com.microsoft.a4o.credentialstorage.helpers.StringHelperTest;
-import com.microsoft.a4o.credentialstorage.helpers.XmlHelper;
 import com.microsoft.a4o.credentialstorage.secret.Credential;
 import org.junit.Assert;
 import org.junit.Before;

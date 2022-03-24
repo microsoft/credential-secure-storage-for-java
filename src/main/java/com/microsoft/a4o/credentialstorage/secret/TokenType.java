@@ -3,6 +3,9 @@
 
 package com.microsoft.a4o.credentialstorage.secret;
 
+/**
+ * Represents a type of security token.
+ */
 public enum TokenType {
     Unknown(null),
     /**
