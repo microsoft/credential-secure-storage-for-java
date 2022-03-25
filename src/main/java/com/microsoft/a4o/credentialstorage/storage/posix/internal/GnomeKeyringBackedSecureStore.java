@@ -11,6 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
+/**
+ * Base class for GNOME Keyring stores.
+ * @param <E> secret class to store
+ */
 public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements SecretStore<E> {
 
     private static final Logger logger = LoggerFactory.getLogger(GnomeKeyringBackedSecureStore.class);
@@ -18,7 +22,7 @@ public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements
     private static final GnomeKeyringLibrary INSTANCE = getGnomeKeyringLibrary();
     private static final GnomeKeyringLibrary.GnomeKeyringPasswordSchema SCHEMA = getGnomeKeyringPasswordSchema();
 
-    public static final String ALLOW_UNLOCK_KEYRING = "AUTH_LIB_ALLOW_UNLOCK_GNOME_KEYRING";
+    protected static final String ALLOW_UNLOCK_KEYRING = "AUTH_LIB_ALLOW_UNLOCK_GNOME_KEYRING";
 
     /**
      * Create a {@code Secret} from the stored string representation

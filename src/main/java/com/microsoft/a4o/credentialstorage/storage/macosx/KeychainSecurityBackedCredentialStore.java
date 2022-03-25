@@ -6,7 +6,10 @@ package com.microsoft.a4o.credentialstorage.storage.macosx;
 import com.microsoft.a4o.credentialstorage.storage.SecretStore;
 import com.microsoft.a4o.credentialstorage.secret.Credential;
 
-public class KeychainSecurityBackedCredentialStore extends KeychainSecurityCliStore
+/**
+ * Keychain store for a credential.
+ */
+public final class KeychainSecurityBackedCredentialStore extends KeychainSecurityCliStore
         implements SecretStore<Credential> {
 
     @Override

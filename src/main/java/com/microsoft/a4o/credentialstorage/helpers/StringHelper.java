@@ -8,8 +8,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * String helper methods.
+ */
 public final class StringHelper {
-    public static final String Empty = "";
+    /**
+     * The empty String.
+     */
+    public static final String EMPTY = "";
 
     private static final Charset UTF8 = StandardCharsets.UTF_8;
 
@@ -18,6 +24,11 @@ public final class StringHelper {
     private StringHelper() {
     }
 
+    /**
+     * Checks if the string is null or of zero length.
+     * @param s string to check
+     * @return true if null or empty
+     */
     public static boolean isNullOrWhiteSpace(final String s) {
         return null == s || (s.trim().length() == 0);
     }
@@ -34,8 +45,8 @@ public final class StringHelper {
      * @param processor  A callback that gets to intercept and modify elements before they are inserted.
      * @return A string that consists of the strings in value delimited by the separator string.
      * -or-
-     * {@link StringHelper#Empty} if count is zero, value has no elements,
-     * or separator and all the elements of value are {@link StringHelper#Empty}.
+     * {@link StringHelper#EMPTY} if count is zero, value has no elements,
+     * or separator and all the elements of value are {@link StringHelper#EMPTY}.
      */
     public static String join(final String separator, final String[] value, final int startIndex, final int count,
                               final Function<String, String> processor) {
@@ -49,19 +60,19 @@ public final class StringHelper {
             throw new IllegalArgumentException("startIndex + count is greater than the number of elements in value");
 
         // "If separator is null, an empty string ( String.Empty) is used instead."
-        final String sep = Objects.requireNonNullElse(separator, StringHelper.Empty);
+        final String sep = Objects.requireNonNullElse(separator, StringHelper.EMPTY);
 
         final StringBuilder result = new StringBuilder();
 
         if (value.length > 0 && count > 0) {
-            String element = Objects.requireNonNullElse(value[startIndex], StringHelper.Empty);
+            String element = Objects.requireNonNullElse(value[startIndex], StringHelper.EMPTY);
             if (processor != null) {
                 element = processor.apply(element);
             }
             result.append(element);
             for (int i = startIndex + 1; i < startIndex + count; i++) {
                 result.append(sep);
-                element = Objects.requireNonNullElse(value[i], StringHelper.Empty);
+                element = Objects.requireNonNullElse(value[i], StringHelper.EMPTY);
                 if (processor != null) {
                     element = processor.apply(element);
                 }

@@ -29,10 +29,10 @@ import java.util.Objects;
 /**
  * Returns a store for credential, token or token pair for the requested security level..
  */
-public class StorageProvider {
-
-    private static final Logger logger  = LoggerFactory.getLogger(StorageProvider.class);
-
+public final class StorageProvider {
+    /**
+     * Option for requesting a store defining whether it is required to be secure or not.
+     */
     public enum SecureOption {
         /**
          * The store must be secure, i.e. generally the storage needs to be password protected
@@ -49,11 +49,16 @@ public class StorageProvider {
         PREFER
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(StorageProvider.class);
+
     private static final List<SecretStore<Token>> PERSISTED_TOKEN_STORE_CANDIDATES;
 
     private static final List<SecretStore<TokenPair>> PERSISTED_TOKENPAIR_STORE_CANDIDATES;
 
     private static final List<SecretStore<Credential>> PERSISTED_CREDENTIAL_STORE_CANDIDATES;
+
+    private StorageProvider() {
+    }
 
     static {
         List<SecretStore<Token>> tokenStoreCandidates = new ArrayList<>();

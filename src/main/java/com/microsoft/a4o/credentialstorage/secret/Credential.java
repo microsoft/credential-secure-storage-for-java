@@ -21,8 +21,8 @@ public final class Credential implements Secret {
      * @param password The password value of the {@link Credential}.
      */
     public Credential(final String username, final String password) {
-        this.username = Objects.requireNonNullElse(username, StringHelper.Empty);
-        this.password = Objects.requireNonNullElse(password, StringHelper.Empty);
+        this.username = Objects.requireNonNullElse(username, StringHelper.EMPTY);
+        this.password = Objects.requireNonNullElse(password, StringHelper.EMPTY);
     }
 
     /**
@@ -31,7 +31,7 @@ public final class Credential implements Secret {
      * @param username The username value of the {@link Credential}.
      */
     public Credential(final String username) {
-        this(username, StringHelper.Empty);
+        this(username, StringHelper.EMPTY);
     }
 
     /**
