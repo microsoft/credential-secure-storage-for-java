@@ -28,7 +28,7 @@ public class XmlHelperTest {
         final Document document = builder.parse(bais);
         final Element rootNode = document.getDocumentElement();
 
-        final String actual = XmlHelper.getText(rootNode);
+        final String actual = XmlHelper.toString(rootNode);
 
         Assert.assertEquals("I am a jelly donut.", actual);
     }

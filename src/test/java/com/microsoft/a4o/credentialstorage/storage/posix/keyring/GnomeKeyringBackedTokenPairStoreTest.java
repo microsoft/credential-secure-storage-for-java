@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See License.txt in the project root.
 
-package com.microsoft.a4o.credentialstorage.storage.posix;
+package com.microsoft.a4o.credentialstorage.storage.posix.keyring;
 
 import com.microsoft.a4o.credentialstorage.helpers.StringHelperTest;
 import com.microsoft.a4o.credentialstorage.secret.TokenPair;
+import com.microsoft.a4o.credentialstorage.storage.posix.XmlHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -15,6 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class GnomeKeyringBackedTokenPairStoreTest {
@@ -59,6 +61,7 @@ public class GnomeKeyringBackedTokenPairStoreTest {
         final String serialized = underTest.serialize(tokenPair);
         final TokenPair processed = underTest.deserialize(serialized);
 
+        assertNotNull(processed);
         assertEquals(tokenPair.getAccessToken(), processed.getAccessToken());
         assertEquals(tokenPair.getRefreshToken(), processed.getRefreshToken());
     }

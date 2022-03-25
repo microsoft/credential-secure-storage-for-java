@@ -3,6 +3,7 @@
 
 package com.microsoft.a4o.credentialstorage.storage.posix.internal;
 
+import com.microsoft.a4o.credentialstorage.storage.posix.keyring.GnomeKeyringBackedSecureStore;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,7 +29,7 @@ public class GnomeKeyringLibraryIT {
     }
 
     @Test
-    public void e2e() throws Exception {
+    public void e2e() {
         final String type = "PersonalAccessToken";
 
         final String password1 = "testingPassword";

@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See License.txt in the project root.
 
-package com.microsoft.a4o.credentialstorage.storage.posix;
+package com.microsoft.a4o.credentialstorage.storage.posix.keyring;
 
 import com.microsoft.a4o.credentialstorage.helpers.StringHelper;
 import com.microsoft.a4o.credentialstorage.secret.Credential;
-import com.microsoft.a4o.credentialstorage.storage.posix.internal.GnomeKeyringBackedSecureStore;
+import com.microsoft.a4o.credentialstorage.storage.posix.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -99,9 +99,9 @@ public final class GnomeKeyringBackedCredentialStore extends GnomeKeyringBackedS
 
             final String propertyName = propertyNode.getNodeName();
             if ("Password".equals(propertyName)) {
-                password = XmlHelper.getText(propertyNode);
+                password = XmlHelper.toString(propertyNode);
             } else if ("Username".equals(propertyName)) {
-                username = XmlHelper.getText(propertyNode);
+                username = XmlHelper.toString(propertyNode);
             }
         }
         value = new Credential(username, password);

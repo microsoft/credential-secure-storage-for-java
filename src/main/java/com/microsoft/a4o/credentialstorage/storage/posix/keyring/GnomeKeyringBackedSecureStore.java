@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See License.txt in the project root.
 
-package com.microsoft.a4o.credentialstorage.storage.posix.internal;
+package com.microsoft.a4o.credentialstorage.storage.posix.keyring;
 
 import com.microsoft.a4o.credentialstorage.helpers.SystemHelper;
 import com.microsoft.a4o.credentialstorage.secret.Secret;
 import com.microsoft.a4o.credentialstorage.storage.SecretStore;
+import com.microsoft.a4o.credentialstorage.storage.posix.internal.GLibInitializer;
+import com.microsoft.a4o.credentialstorage.storage.posix.internal.GnomeKeyringLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

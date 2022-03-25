@@ -12,10 +12,10 @@ import com.microsoft.a4o.credentialstorage.storage.macosx.KeychainSecurityBacked
 import com.microsoft.a4o.credentialstorage.storage.macosx.KeychainSecurityBackedTokenPairStore;
 import com.microsoft.a4o.credentialstorage.storage.macosx.KeychainSecurityBackedTokenStore;
 import com.microsoft.a4o.credentialstorage.storage.memory.InsecureInMemoryStore;
-import com.microsoft.a4o.credentialstorage.storage.posix.GnomeKeyringBackedCredentialStore;
-import com.microsoft.a4o.credentialstorage.storage.posix.GnomeKeyringBackedTokenPairStore;
-import com.microsoft.a4o.credentialstorage.storage.posix.GnomeKeyringBackedTokenStore;
-import com.microsoft.a4o.credentialstorage.storage.posix.internal.GnomeKeyringBackedSecureStore;
+import com.microsoft.a4o.credentialstorage.storage.posix.keyring.GnomeKeyringBackedCredentialStore;
+import com.microsoft.a4o.credentialstorage.storage.posix.keyring.GnomeKeyringBackedTokenPairStore;
+import com.microsoft.a4o.credentialstorage.storage.posix.keyring.GnomeKeyringBackedTokenStore;
+import com.microsoft.a4o.credentialstorage.storage.posix.keyring.GnomeKeyringBackedSecureStore;
 import com.microsoft.a4o.credentialstorage.storage.windows.CredManagerBackedCredentialStore;
 import com.microsoft.a4o.credentialstorage.storage.windows.CredManagerBackedTokenPairStore;
 import com.microsoft.a4o.credentialstorage.storage.windows.CredManagerBackedTokenStore;

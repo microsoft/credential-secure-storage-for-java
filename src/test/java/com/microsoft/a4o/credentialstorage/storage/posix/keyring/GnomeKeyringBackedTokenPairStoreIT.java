@@ -1,10 +1,9 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See License.txt in the project root.
 
-package com.microsoft.a4o.credentialstorage.storage.posix;
+package com.microsoft.a4o.credentialstorage.storage.posix.keyring;
 
 import com.microsoft.a4o.credentialstorage.secret.TokenPair;
-import com.microsoft.a4o.credentialstorage.storage.posix.internal.GnomeKeyringBackedSecureStore;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,7 +24,8 @@ public class GnomeKeyringBackedTokenPairStoreIT {
         underTest = new GnomeKeyringBackedTokenPairStore();
     }
 
-    private final String sampleAccessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik1uQ19WWmNBVGZNNXBPWW" +
+    private static final String SAMPLE_ACCESS_TOKEN =
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik1uQ19WWmNBVGZNNXBPWW" +
             "lKSE1iYTlnb0VLWSIsImtpZCI6Ik1uQ19WWmNBVGZNNXBPWWlKSE1iYTlnb0VLWSJ9.eyJhdWQiOiJodHRwcz" +
             "ovL21hbmFnZW1lbnQuY29yZS53aW5kb3dzLm5ldC8iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9" +
             "mOGNkZWYzMS1hMzFlLTRiNGEtOTNlNC01ZjU3MWU5MTI1NWEvIiwiaWF0IjoxNDU4NzUwOTc3LCJuYmYiOjE0NT" +
@@ -41,7 +41,8 @@ public class GnomeKeyringBackedTokenPairStoreIT {
             "NQFecidci7Xr_aGSFTq1KMK2dwDz1LDdVbSx8wJP__LU3DDPzUR-eitSdXkMFLBzZpMA92nPhBAQWnks0xEtEd3" +
             "pK_Jerl82xaK5IhVzEhkh70deCDgGB_90DoxlGf93Aursq5I5WKRQ";
 
-    private final String sampleRefreshToken = "AAABAAAAiL9Kn2Z27UubvWFPbm0gLWTuMRxgA2q_tw71qiUQeaQ2JiRdQOroj2" +
+    private static final String SAMPLE_REFRESH_TOKEN =
+            "AAABAAAAiL9Kn2Z27UubvWFPbm0gLWTuMRxgA2q_tw71qiUQeaQ2JiRdQOroj2" +
             "7iBaKg7AFEMyE-V_DdbHvY6SIkJJHstS_xfWN_2zquKaHTrHI_EgIX7ZS7Ik8ChNTcba8g8d4geT72x9mosR9HZkwY" +
             "eUN1y9wr9f5ECmiCCisDNUNk9bvx86ZnpsJ3DtsQyaPmqcSf5cxQ3XX7fjGljZ0JyWCeCdnNcKsvrBajfWIpW37K3wXpoC" +
             "NFNIthL--rcchCXHd1yOaBtSWZmhL2bObot00mOeQh42mp01JgNH2EtqStPUA3a63hIrUMLWSVNyxCA5xgMsryygro" +
@@ -53,7 +54,7 @@ public class GnomeKeyringBackedTokenPairStoreIT {
     public void saveTokenPair() {
         final String testKey = "http://thisisatestkey";
 
-        final TokenPair tokenPair = new TokenPair(sampleAccessToken, sampleRefreshToken);
+        final TokenPair tokenPair = new TokenPair(SAMPLE_ACCESS_TOKEN, SAMPLE_REFRESH_TOKEN);
         boolean added = underTest.add(testKey, tokenPair);
 
         assertTrue(added);
