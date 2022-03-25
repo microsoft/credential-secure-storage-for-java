@@ -20,7 +20,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Objects;
 
-public class GnomeKeyringBackedCredentialStore extends GnomeKeyringBackedSecureStore<Credential> {
+/**
+ * GNOME Keyring store for a credential.
+ */
+public final class GnomeKeyringBackedCredentialStore extends GnomeKeyringBackedSecureStore<Credential> {
 
     private static final Logger logger = LoggerFactory.getLogger(GnomeKeyringBackedCredentialStore.class);
 

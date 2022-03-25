@@ -15,7 +15,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 
-class XmlHelper {
+final class XmlHelper {
+    private XmlHelper() {
+    }
+
     // Adapted from http://docs.oracle.com/javase/tutorial/jaxp/dom/readingXML.html
     public static String getText(final Node node) {
         final StringBuilder result = new StringBuilder();

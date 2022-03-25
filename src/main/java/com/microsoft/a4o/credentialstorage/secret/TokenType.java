@@ -7,6 +7,9 @@ package com.microsoft.a4o.credentialstorage.secret;
  * Represents a type of security token.
  */
 public enum TokenType {
+    /**
+     * Unknown type.
+     */
     Unknown(null),
     /**
      * Access Token
@@ -35,6 +38,10 @@ public enum TokenType {
         this.description = description;
     }
 
+    /**
+     * Returns token description.
+     * @return description
+     */
     public String getDescription() {
         return description;
     }

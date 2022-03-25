@@ -7,7 +7,10 @@ import com.microsoft.a4o.credentialstorage.secret.Token;
 import com.microsoft.a4o.credentialstorage.secret.TokenType;
 import com.microsoft.a4o.credentialstorage.storage.posix.internal.GnomeKeyringBackedSecureStore;
 
-public class GnomeKeyringBackedTokenStore extends GnomeKeyringBackedSecureStore<Token> {
+/**
+ * GNOME Keyring store for a token.
+ */
+public final class GnomeKeyringBackedTokenStore extends GnomeKeyringBackedSecureStore<Token> {
 
     @Override
     protected Token deserialize(final String secret) {

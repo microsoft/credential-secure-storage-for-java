@@ -6,9 +6,12 @@ package com.microsoft.a4o.credentialstorage.storage.windows;
 import com.microsoft.a4o.credentialstorage.secret.TokenPair;
 import com.microsoft.a4o.credentialstorage.storage.windows.internal.CredManagerBackedSecureStore;
 
-public class CredManagerBackedTokenPairStore extends CredManagerBackedSecureStore<TokenPair> {
+/**
+ * Credential Manager store for a token pair.
+ */
+public final class CredManagerBackedTokenPairStore extends CredManagerBackedSecureStore<TokenPair> {
 
-    public static final String TOKEN_PAIR_USERNAME = "Access and Refresh Token";
+    private static final String TOKEN_PAIR_USERNAME = "Access and Refresh Token";
 
     @Override
     protected TokenPair create(final String username, final String secret) {

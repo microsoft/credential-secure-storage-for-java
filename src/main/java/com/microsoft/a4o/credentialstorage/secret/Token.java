@@ -18,6 +18,13 @@ public final class Token implements Secret {
     private final String value;
     private final UUID targetIdentity;
 
+    /**
+     * Creates a token object with a value and the specified type for a target identity.
+     *
+     * @param value token value
+     * @param type token type
+     * @param targetIdentity token target identity
+     */
     public Token(final String value, final TokenType type, final UUID targetIdentity) {
         if (StringHelper.isNullOrWhiteSpace(value)) {
             throw new IllegalArgumentException("The value parameter is null or invalid");
@@ -30,12 +37,19 @@ public final class Token implements Secret {
         this.targetIdentity = targetIdentity;
     }
 
+    /**
+     * Creates a token object with a value and the specified type with zero UUID as a target identity.
+     *
+     * @param value token value
+     * @param type token type
+     */
     public Token(final String value, final TokenType type) {
         this(value, type, EMPTY_UUID);
     }
 
     /**
      * The type of the security token.
+     * @return token type
      */
     public TokenType getType() {
         return type;
@@ -43,6 +57,7 @@ public final class Token implements Secret {
 
     /**
      * The raw contents of the token.
+     * @return token value
      */
     public String getValue() {
         return value;
@@ -50,6 +65,7 @@ public final class Token implements Secret {
 
     /**
      * The target identity for the security token.
+     * @return token target identity
      */
     public UUID getTargetIdentity() {
         return targetIdentity;

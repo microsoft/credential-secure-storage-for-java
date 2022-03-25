@@ -8,7 +8,7 @@ package com.microsoft.a4o.credentialstorage.storage.posix.internal;
  *
  * Otherwise, we may see warnings such as: g_set_application_name() called multiple times
  */
-public class GLibInitializer {
+public final class GLibInitializer {
 
     private final GLibLibrary GLIB_INSTANCE = GLibLibrary.INSTANCE;
 
@@ -22,10 +22,17 @@ public class GLibInitializer {
         public static final GLibInitializer INSTANCE = new GLibInitializer();
     }
 
+    /**
+     * Returns the singleton instance.
+     * @return instance
+     */
     public static GLibInitializer getInstance() {
         return GLibInitializerClassHolder.INSTANCE;
     }
 
+    /**
+     * Initialize Glib library by setting an application name that will be printed in Glib logs and error messages.
+     */
     public synchronized void initialize() {
         if (!glibInitialized) {
             GLIB_INSTANCE.g_set_application_name("Credential Secure Storage");

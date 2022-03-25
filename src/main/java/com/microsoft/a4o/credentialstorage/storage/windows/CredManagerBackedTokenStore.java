@@ -7,9 +7,12 @@ import com.microsoft.a4o.credentialstorage.secret.Token;
 import com.microsoft.a4o.credentialstorage.secret.TokenType;
 import com.microsoft.a4o.credentialstorage.storage.windows.internal.CredManagerBackedSecureStore;
 
-public class CredManagerBackedTokenStore extends CredManagerBackedSecureStore<Token> {
+/**
+ * Credential Manager store for a token.
+ */
+public final class CredManagerBackedTokenStore extends CredManagerBackedSecureStore<Token> {
 
-    public static final String TOKEN_USERNAME = "PersonalAccessToken";
+    static final String TOKEN_USERNAME = "PersonalAccessToken";
 
     @Override
     protected Token create(final String username, final String secret) {

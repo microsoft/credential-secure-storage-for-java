@@ -9,13 +9,14 @@ import com.microsoft.a4o.credentialstorage.storage.SecretStore;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class InsecureInMemoryStore<E extends Secret> implements SecretStore<E> {
+/**
+ * In-memory insecure store based on a hash map.
+ *
+ * @param <E> secret type to store
+ */
+public final class InsecureInMemoryStore<E extends Secret> implements SecretStore<E> {
 
-    private final ConcurrentMap<String, E> store;
-
-    public InsecureInMemoryStore() {
-        store = new ConcurrentHashMap<>();
-    }
+    private final ConcurrentMap<String, E> store = new ConcurrentHashMap<>();
 
     @Override
     public E get(final String key) {

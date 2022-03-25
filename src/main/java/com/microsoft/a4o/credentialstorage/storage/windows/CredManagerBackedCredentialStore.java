@@ -6,7 +6,10 @@ package com.microsoft.a4o.credentialstorage.storage.windows;
 import com.microsoft.a4o.credentialstorage.secret.Credential;
 import com.microsoft.a4o.credentialstorage.storage.windows.internal.CredManagerBackedSecureStore;
 
-public class CredManagerBackedCredentialStore extends CredManagerBackedSecureStore<Credential> {
+/**
+ * Credential Manager store for a credential.
+ */
+public final class CredManagerBackedCredentialStore extends CredManagerBackedSecureStore<Credential> {
 
     @Override
     protected Credential create(final String username, final String secret) {

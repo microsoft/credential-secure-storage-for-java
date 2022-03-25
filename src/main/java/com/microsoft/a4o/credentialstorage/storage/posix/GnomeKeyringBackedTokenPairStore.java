@@ -20,7 +20,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Objects;
 
-public class GnomeKeyringBackedTokenPairStore extends GnomeKeyringBackedSecureStore<TokenPair> {
+/**
+ * GNOME Keyring store for a token pair.
+ */
+public final class GnomeKeyringBackedTokenPairStore extends GnomeKeyringBackedSecureStore<TokenPair> {
 
     private static final Logger logger = LoggerFactory.getLogger(GnomeKeyringBackedTokenPairStore.class);
 

@@ -19,7 +19,7 @@ public class StringHelperTest {
 
     @Test
     public void isNullOrWhiteSpace_empty() {
-        Assert.assertTrue(StringHelper.isNullOrWhiteSpace(StringHelper.Empty));
+        Assert.assertTrue(StringHelper.isNullOrWhiteSpace(StringHelper.EMPTY));
     }
 
     @Test
@@ -77,21 +77,21 @@ public class StringHelperTest {
     public void join_returnsStringEmptyIfCountZero() {
         final String[] a = {"a", "b", "c"};
 
-        Assert.assertEquals(StringHelper.Empty, StringHelper.join(",", a, 0, 0, Function.identity()));
+        Assert.assertEquals(StringHelper.EMPTY, StringHelper.join(",", a, 0, 0, Function.identity()));
     }
 
     @Test
     public void join_returnsStringEmptyIfValueHasNoElements() {
         final String[] emptyArray = {};
 
-        Assert.assertEquals(StringHelper.Empty, StringHelper.join(",", emptyArray, 0, 0, Function.identity()));
+        Assert.assertEquals(StringHelper.EMPTY, StringHelper.join(",", emptyArray, 0, 0, Function.identity()));
     }
 
     @Test
     public void join_returnsStringEmptyIfSeparatorAndAllElementsAreEmpty() {
-        final String[] arrayOfEmpty = {StringHelper.Empty, StringHelper.Empty, StringHelper.Empty};
+        final String[] arrayOfEmpty = {StringHelper.EMPTY, StringHelper.EMPTY, StringHelper.EMPTY};
 
-        Assert.assertEquals(StringHelper.Empty, StringHelper.join(StringHelper.Empty, arrayOfEmpty, 0, 3, Function.identity()));
+        Assert.assertEquals(StringHelper.EMPTY, StringHelper.join(StringHelper.EMPTY, arrayOfEmpty, 0, 3, Function.identity()));
     }
 
     @Test
@@ -119,7 +119,7 @@ public class StringHelperTest {
                 Assert.fail("'expected' contained more lines than 'actual'.");
             }
         }
-        if ((actualLine = actualBr.readLine()) != null) {
+        if ((actualBr.readLine()) != null) {
             Assert.fail("'actual' contained more lines than 'expected'.");
         }
     }

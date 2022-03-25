@@ -8,7 +8,10 @@ import com.microsoft.a4o.credentialstorage.helpers.StringHelper;
 import java.util.Collections;
 import java.util.Map;
 
-public class TokenPair implements Secret {
+/**
+ * A security token pair, combining access and refresh tokens.
+ */
+public final class TokenPair implements Secret {
     private final Token accessToken;
     private final Token refreshToken;
     private final Map<String, String> parameters;
@@ -18,8 +21,9 @@ public class TokenPair implements Secret {
      *
      * @param accessToken  The base64 encoded value of the access token's raw data
      * @param refreshToken The base64 encoded value of the refresh token's raw data
+     * @param parameters Map with additional parameters for the token pair
      */
-    public TokenPair(final String accessToken, final String refreshToken) {
+    public TokenPair(final String accessToken, final String refreshToken, final Map<String, String> parameters) {
         if (StringHelper.isNullOrWhiteSpace(accessToken)) {
             throw new IllegalArgumentException("The accessToken parameter is null or invalid.");
         }
@@ -29,11 +33,22 @@ public class TokenPair implements Secret {
 
         this.accessToken = new Token(accessToken, TokenType.Access);
         this.refreshToken = new Token(refreshToken, TokenType.Refresh);
-        this.parameters = Collections.emptyMap();
+        this.parameters = Collections.unmodifiableMap(parameters);
+    }
+
+    /**
+     * Creates a new {@link TokenPair} from raw access and refresh token data.
+     *
+     * @param accessToken  The base64 encoded value of the access token's raw data
+     * @param refreshToken The base64 encoded value of the refresh token's raw data
+     */
+    public TokenPair(final String accessToken, final String refreshToken) {
+        this(accessToken, refreshToken, Collections.emptyMap());
     }
 
     /**
      * Access token, used to grant access to resources.
+     * @return access token
      */
     public Token getAccessToken() {
         return accessToken;
@@ -41,6 +56,7 @@ public class TokenPair implements Secret {
 
     /**
      * Refresh token, used to grant new access tokens.
+     * @return refresh token
      */
     public Token getRefreshToken() {
         return refreshToken;
@@ -48,6 +64,7 @@ public class TokenPair implements Secret {
 
     /**
      * Additional token parameters.
+     * @return token additional parameters
      */
     public Map<String, String> getParameters() {
         return parameters;
