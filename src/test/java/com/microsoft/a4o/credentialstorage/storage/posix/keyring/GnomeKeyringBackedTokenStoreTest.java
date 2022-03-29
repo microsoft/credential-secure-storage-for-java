@@ -23,7 +23,7 @@ public class GnomeKeyringBackedTokenStoreTest {
 
     @Test
     public void serializeDeserialize() {
-        final Token token = new Token(UUID.randomUUID().toString(), TokenType.Personal);
+        final Token token = new Token(UUID.randomUUID().toString(), TokenType.PERSONAL);
         final String serialized = underTest.serialize(token);
         final Token processed = underTest.deserialize(serialized) ;
 

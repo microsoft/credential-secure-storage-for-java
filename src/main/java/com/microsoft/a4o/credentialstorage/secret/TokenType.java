@@ -10,27 +10,27 @@ public enum TokenType {
     /**
      * Unknown type.
      */
-    Unknown(null),
+    UNKNOWN(null),
     /**
      * Access Token
      */
-    Access("Access Token"),
+    ACCESS("Access Token"),
     /**
      * Refresh Token
      */
-    Refresh("Refresh Token"),
+    REFRESH("Refresh Token"),
     /**
      * Personal Access Token, can be compact or not.
      */
-    Personal("Personal Access Token"),
+    PERSONAL("Personal Access Token"),
     /**
      * Federated Authentication (aka FedAuth) Token
      */
-    Federated("Federated Authentication Token"),
+    FEDERATED("Federated Authentication Token"),
     /**
      * Used only for testing
      */
-    Test("Test-only Token");
+    TEST("Test-only Token");
 
     private final String description;
 

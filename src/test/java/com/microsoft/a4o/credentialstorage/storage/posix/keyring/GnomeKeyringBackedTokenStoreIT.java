@@ -29,7 +29,7 @@ public class GnomeKeyringBackedTokenStoreIT {
     public void saveToken() {
         final String testKey = "http://thisisatestkey";
 
-        final Token token = new Token("bi4295xkwev6djxej7hpffuoo4rzcqcogakubpu2sd7kopuoquaq", TokenType.Personal);
+        final Token token = new Token("bi4295xkwev6djxej7hpffuoo4rzcqcogakubpu2sd7kopuoquaq", TokenType.PERSONAL);
         boolean added = underTest.add(testKey, token);
 
         assertTrue(added);

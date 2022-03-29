@@ -21,7 +21,7 @@ public class CredManagerBackedTokenStoreTest {
 
     //low value basic tests that should auto run
     @Test
-    public void testCreate() throws Exception {
+    public void testCreate() {
         final String secretValue = "my secret";
         Token token = underTest.create("do not care", secretValue);
 
@@ -29,15 +29,15 @@ public class CredManagerBackedTokenStoreTest {
     }
 
     @Test
-    public void testGetUsername() throws Exception {
-        final Token token = new Token("do not care", TokenType.Personal);
+    public void testGetUsername() {
+        final Token token = new Token("do not care", TokenType.PERSONAL);
         assertEquals("Username is not correct", CredManagerBackedTokenStore.TOKEN_USERNAME,
                 underTest.getUsername(token));
     }
 
     @Test
-    public void testGetCredentialBlob() throws Exception {
-        final Token token = new Token("do not care", TokenType.Personal);
+    public void testGetCredentialBlob() {
+        final Token token = new Token("do not care", TokenType.PERSONAL);
         assertEquals("CredentialBlob is not correct", "do not care",
                 underTest.getCredentialBlob(token));
     }

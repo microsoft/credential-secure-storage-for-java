@@ -13,7 +13,7 @@ public final class GnomeKeyringBackedTokenStore extends GnomeKeyringBackedSecure
 
     @Override
     protected Token deserialize(final String secret) {
-        return new Token(secret, TokenType.Personal);
+        return new Token(secret, TokenType.PERSONAL);
     }
 
     @Override

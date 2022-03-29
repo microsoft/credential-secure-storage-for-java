@@ -33,8 +33,8 @@ public final class TokenPair implements Secret {
         }
         Objects.requireNonNull(parameters, "The parameters parameter is null");
 
-        this.accessToken = new Token(accessToken, TokenType.Access);
-        this.refreshToken = new Token(refreshToken, TokenType.Refresh);
+        this.accessToken = new Token(accessToken, TokenType.ACCESS);
+        this.refreshToken = new Token(refreshToken, TokenType.REFRESH);
         this.parameters = Map.copyOf(parameters);
     }
 

@@ -16,7 +16,7 @@ public final class CredManagerBackedTokenStore extends CredManagerBackedSecureSt
 
     @Override
     protected Token create(final String username, final String secret) {
-        return new Token(secret, TokenType.Personal);
+        return new Token(secret, TokenType.PERSONAL);
     }
 
     @Override
