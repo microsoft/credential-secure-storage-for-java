@@ -74,12 +74,15 @@ public final class Token implements Secret {
     /**
      * Compares an object to this {@link Token} for equality.
      *
-     * @param obj The object to compare.
+     * @param o The object to compare.
      * @return True is equal; false otherwise.
      */
     @Override
-    public boolean equals(final Object obj) {
-        return operatorEquals(this, obj instanceof Token ? ((Token) obj) : null);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Token token = (Token) o;
+        return type == token.type && value.equals(token.value) && targetIdentity.equals(token.targetIdentity);
     }
 
     /**
@@ -89,23 +92,6 @@ public final class Token implements Secret {
      */
     @Override
     public int hashCode() {
-        return type.ordinal() * value.hashCode();
-    }
-
-    /**
-     * Compares two tokens for equality.
-     *
-     * @param token1 Token to compare.
-     * @param token2 Token to compare.
-     * @return True if equal; false otherwise.
-     */
-    public static boolean operatorEquals(final Token token1, final Token token2) {
-        if (token1 == token2)
-            return true;
-        if ((token1 == null) || (null == token2))
-            return false;
-
-        return token1.type == token2.type
-                && token1.value.equalsIgnoreCase(token2.value);
+        return Objects.hash(type, value, targetIdentity);
     }
 }

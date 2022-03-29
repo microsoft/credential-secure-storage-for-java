@@ -7,6 +7,7 @@ import com.microsoft.a4o.credentialstorage.helpers.StringHelper;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A security token pair, combining access and refresh tokens.
@@ -30,10 +31,11 @@ public final class TokenPair implements Secret {
         if (StringHelper.isNullOrWhiteSpace(refreshToken)) {
             throw new IllegalArgumentException("The refreshToken parameter is null or invalid.");
         }
+        Objects.requireNonNull(parameters, "The parameters parameter is null");
 
         this.accessToken = new Token(accessToken, TokenType.Access);
         this.refreshToken = new Token(refreshToken, TokenType.Refresh);
-        this.parameters = Collections.unmodifiableMap(parameters);
+        this.parameters = Map.copyOf(parameters);
     }
 
     /**
@@ -73,12 +75,17 @@ public final class TokenPair implements Secret {
     /**
      * Compares an object to this.
      *
-     * @param object The object to compare.
+     * @param o The object to compare.
      * @return True if equal; false otherwise
      */
     @Override
-    public boolean equals(final Object object) {
-        return operatorEquals(this, object instanceof TokenPair ? ((TokenPair) object) : null);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TokenPair tokenPair = (TokenPair) o;
+        return accessToken.equals(tokenPair.accessToken)
+                && refreshToken.equals(tokenPair.refreshToken)
+                && parameters.equals(tokenPair.parameters);
     }
 
     /**
@@ -88,23 +95,6 @@ public final class TokenPair implements Secret {
      */
     @Override
     public int hashCode() {
-        return accessToken.hashCode() * refreshToken.hashCode();
-    }
-
-    /**
-     * Compares two {@link TokenPair} for equality.
-     *
-     * @param pair1 {@link TokenPair} to compare.
-     * @param pair2 {@link TokenPair} to compare.
-     * @return True if equal; false otherwise.
-     */
-    public static boolean operatorEquals(final TokenPair pair1, final TokenPair pair2) {
-        if (pair1 == pair2)
-            return true;
-        if ((pair1 == null) || (null == pair2))
-            return false;
-
-        return Token.operatorEquals(pair1.accessToken, pair2.accessToken)
-                && Token.operatorEquals(pair1.refreshToken, pair2.refreshToken);
+        return Objects.hash(accessToken, refreshToken, parameters);
     }
 }
