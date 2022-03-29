@@ -253,6 +253,7 @@ SOFTWARE
           </execution>
         </executions>
         <configuration>
+          <excludes>**/module-info.java</excludes>
           <checkstyleRules>
             <module name="Checker">
               <module name="Header">
