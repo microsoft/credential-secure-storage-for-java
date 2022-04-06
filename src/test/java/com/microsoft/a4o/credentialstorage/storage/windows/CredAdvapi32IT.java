@@ -3,7 +3,6 @@
 
 package com.microsoft.a4o.credentialstorage.storage.windows;
 
-import com.microsoft.a4o.credentialstorage.helpers.SystemHelper;
 import com.sun.jna.LastErrorException;
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
@@ -24,7 +23,7 @@ public class CredAdvapi32IT {
 
     @Before
     public void setUp() {
-        assumeTrue(SystemHelper.isWindows());
+        assumeTrue(CredManagerBackedSecureStore.isSupported());
     }
 
     public static final String UTF8 = "UTF-8";

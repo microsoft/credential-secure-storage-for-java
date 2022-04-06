@@ -3,7 +3,6 @@
 
 package com.microsoft.a4o.credentialstorage.storage.windows;
 
-import com.microsoft.a4o.credentialstorage.helpers.SystemHelper;
 import com.microsoft.a4o.credentialstorage.secret.TokenPair;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +16,7 @@ public class CredManagerBackedTokenPairStoreIT {
 
     @Before
     public void setUp() throws Exception {
-        assumeTrue(SystemHelper.isWindows());
+        assumeTrue(CredManagerBackedSecureStore.isSupported());
 
         underTest = new CredManagerBackedTokenPairStore();
     }

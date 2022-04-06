@@ -3,7 +3,6 @@
 
 package com.microsoft.a4o.credentialstorage.storage;
 
-import com.microsoft.a4o.credentialstorage.helpers.SystemHelper;
 import com.microsoft.a4o.credentialstorage.secret.Credential;
 import com.microsoft.a4o.credentialstorage.secret.Secret;
 import com.microsoft.a4o.credentialstorage.secret.Token;
@@ -11,12 +10,14 @@ import com.microsoft.a4o.credentialstorage.secret.TokenPair;
 import com.microsoft.a4o.credentialstorage.storage.macosx.KeychainSecurityBackedCredentialStore;
 import com.microsoft.a4o.credentialstorage.storage.macosx.KeychainSecurityBackedTokenPairStore;
 import com.microsoft.a4o.credentialstorage.storage.macosx.KeychainSecurityBackedTokenStore;
+import com.microsoft.a4o.credentialstorage.storage.macosx.KeychainSecurityCliStore;
 import com.microsoft.a4o.credentialstorage.storage.memory.InsecureInMemoryStore;
 import com.microsoft.a4o.credentialstorage.storage.posix.keyring.GnomeKeyringBackedCredentialStore;
 import com.microsoft.a4o.credentialstorage.storage.posix.keyring.GnomeKeyringBackedTokenPairStore;
 import com.microsoft.a4o.credentialstorage.storage.posix.keyring.GnomeKeyringBackedTokenStore;
 import com.microsoft.a4o.credentialstorage.storage.posix.keyring.GnomeKeyringBackedSecureStore;
 import com.microsoft.a4o.credentialstorage.storage.windows.CredManagerBackedCredentialStore;
+import com.microsoft.a4o.credentialstorage.storage.windows.CredManagerBackedSecureStore;
 import com.microsoft.a4o.credentialstorage.storage.windows.CredManagerBackedTokenPairStore;
 import com.microsoft.a4o.credentialstorage.storage.windows.CredManagerBackedTokenStore;
 import org.slf4j.Logger;
@@ -65,19 +66,19 @@ public final class StorageProvider {
         List<SecretStore<TokenPair>> tokenPairStoreCandidates = new ArrayList<>();
         List<SecretStore<Credential>> credentialStoreCandidates = new ArrayList<>();
 
-        if (SystemHelper.isWindows()) {
+        if (CredManagerBackedSecureStore.isSupported()) {
             tokenStoreCandidates.add(new CredManagerBackedTokenStore());
             credentialStoreCandidates.add(new CredManagerBackedCredentialStore());
             tokenPairStoreCandidates.add(new CredManagerBackedTokenPairStore());
         }
 
-        if (SystemHelper.isMac()) {
+        if (KeychainSecurityCliStore.isSupported()) {
             tokenStoreCandidates.add(new KeychainSecurityBackedTokenStore());
             credentialStoreCandidates.add(new KeychainSecurityBackedCredentialStore());
             tokenPairStoreCandidates.add(new KeychainSecurityBackedTokenPairStore());
         }
 
-        if (SystemHelper.isLinux() && GnomeKeyringBackedSecureStore.isGnomeKeyringSupported()) {
+        if (GnomeKeyringBackedSecureStore.isSupported()) {
             tokenStoreCandidates.add(new GnomeKeyringBackedTokenStore());
             credentialStoreCandidates.add(new GnomeKeyringBackedCredentialStore());
             tokenPairStoreCandidates.add(new GnomeKeyringBackedTokenPairStore());

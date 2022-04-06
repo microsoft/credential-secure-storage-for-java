@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class KeychainSecurityCliStore {
+public class KeychainSecurityCliStore {
 
     private static final String SECURITY = "/usr/bin/security";
     private static final String DELETE_GENERIC_PASSWORD = "delete-generic-password";
@@ -59,6 +59,10 @@ class KeychainSecurityCliStore {
         StringValue,
         TimeDateValue,
         ValueFinished
+    }
+
+    public static boolean isSupported() {
+        return System.getProperty("os.name").equals("Mac OS X");
     }
 
     protected boolean deleteByKind(final String targetName, final SecretKind kind) {

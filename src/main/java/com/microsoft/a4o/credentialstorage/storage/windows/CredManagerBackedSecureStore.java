@@ -3,7 +3,6 @@
 
 package com.microsoft.a4o.credentialstorage.storage.windows;
 
-import com.microsoft.a4o.credentialstorage.helpers.SystemHelper;
 import com.microsoft.a4o.credentialstorage.secret.Secret;
 import com.microsoft.a4o.credentialstorage.storage.SecretStore;
 import com.sun.jna.LastErrorException;
@@ -102,6 +101,10 @@ public abstract class CredManagerBackedSecureStore<E extends Secret> implements 
     @Override
     public boolean isSecure() {
         return true;
+    }
+
+    public static boolean isSupported() {
+        return isWindows();
     }
 
     private E createSecret(final CredAdvapi32.CREDENTIAL credential) {
@@ -208,8 +211,12 @@ public abstract class CredManagerBackedSecureStore<E extends Secret> implements 
         return UTF16LE.decode(ByteBuffer.wrap(bytes)).array();
     }
 
+    private static boolean isWindows() {
+        return System.getProperty("os.name").startsWith("Windows");
+    }
+
     private static CredAdvapi32 getCredAdvapi32Instance() {
-        if (SystemHelper.isWindows()) {
+        if (isSupported()) {
             return CredAdvapi32.INSTANCE;
         } else {
             logger.warn("Returning a dummy library on non Windows platform.  " +

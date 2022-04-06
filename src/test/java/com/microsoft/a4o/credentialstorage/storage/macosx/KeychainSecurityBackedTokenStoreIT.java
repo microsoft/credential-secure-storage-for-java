@@ -3,7 +3,6 @@
 
 package com.microsoft.a4o.credentialstorage.storage.macosx;
 
-import com.microsoft.a4o.credentialstorage.helpers.SystemHelper;
 import com.microsoft.a4o.credentialstorage.secret.Token;
 import com.microsoft.a4o.credentialstorage.secret.TokenType;
 import org.junit.Before;
@@ -19,7 +18,7 @@ public class KeychainSecurityBackedTokenStoreIT {
 
     @Before
     public void setup() {
-        assumeTrue(SystemHelper.isMac());
+        assumeTrue(KeychainSecurityCliStore.isSupported());
 
         underTest = new KeychainSecurityBackedTokenStore();
     }

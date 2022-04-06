@@ -19,7 +19,7 @@ public class GnomeKeyringBackedCredentialStoreIT {
     @Before
     public void setUp() throws Exception {
         //Only test on platform that has gnome-keyring support
-        assumeTrue(GnomeKeyringBackedSecureStore.isGnomeKeyringSupported());
+        assumeTrue(GnomeKeyringBackedSecureStore.isSupported());
 
         underTest = new GnomeKeyringBackedCredentialStore();
     }

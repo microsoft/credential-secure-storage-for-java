@@ -3,7 +3,6 @@
 
 package com.microsoft.a4o.credentialstorage.storage.posix.keyring;
 
-import com.microsoft.a4o.credentialstorage.helpers.SystemHelper;
 import com.microsoft.a4o.credentialstorage.secret.Secret;
 import com.microsoft.a4o.credentialstorage.storage.SecretStore;
 import com.microsoft.a4o.credentialstorage.storage.posix.internal.GLibInitializer;
@@ -24,7 +23,6 @@ public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements
     protected static final GnomeKeyringLibrary.GnomeKeyringPasswordSchema SCHEMA = getGnomeKeyringPasswordSchema();
 
     protected static final String ALLOW_UNLOCK_KEYRING = "AUTH_LIB_ALLOW_UNLOCK_GNOME_KEYRING";
-
 
     /**
      * Return the type of this secure store, used to match the secret in GNOME Keyring
@@ -57,6 +55,35 @@ public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements
         return true;
     }
 
+    public static boolean isSupported() {
+        return isLinux() && isGnomeKeyringSupported();
+    }
+
+    /**
+     * Check for GNOME Keyring support on this platform
+     *
+     * @return {@code true} if gnome-keyring library is available; {@code false} otherwise
+     */
+    private static boolean isGnomeKeyringSupported() {
+        try {
+            if (INSTANCE != null && SCHEMA != null) {
+                // If we are here that means we have loaded gnome-keyring library
+                final GnomeKeyringLibrary.PointerToPointer keyring_info = getGnomeKeyringInfoStruct();
+                if (keyring_info != null) {
+                    try {
+                        return isSimplePasswordAPISupported() && isGnomeKeyringUnlocked(keyring_info);
+                    } finally {
+                        INSTANCE.gnome_keyring_info_free(keyring_info.pointer);
+                    }
+                }
+            }
+        } catch (final Throwable t) {
+            logger.warn("Gnome Keyring is not available.", t);
+        }
+
+        return false;
+    }
+
     protected char[] getSecret(final String key) {
         final GnomeKeyringLibrary.PointerToPointer pPassword = new GnomeKeyringLibrary.PointerToPointer();
         char[] secret = null;
@@ -79,32 +106,7 @@ public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements
         return secret;
     }
 
-    /**
-     * Check for GNOME Keyring support on this platform
-     *
-     * @return {@code true} if gnome-keyring library is available; {@code false} otherwise
-     */
-    public static boolean isGnomeKeyringSupported() {
-        try {
-            if (INSTANCE != null && SCHEMA != null) {
-                // If we are here that means we have loaded gnome-keyring library
-                final GnomeKeyringLibrary.PointerToPointer keyring_info = getGnomeKeyringInfoStruct();
-                if (keyring_info != null) {
-                    try {
-                        return isSimplePasswordAPISupported() && isGnomeKeyringUnlocked(keyring_info);
-                    } finally {
-                        INSTANCE.gnome_keyring_info_free(keyring_info.pointer);
-                    }
-                }
-            }
-        } catch (final Throwable t) {
-            logger.warn("Gnome Keyring is not available.", t);
-        }
-
-        return false;
-    }
-
-    private static GnomeKeyringLibrary.PointerToPointer getGnomeKeyringInfoStruct() { 
+    private static GnomeKeyringLibrary.PointerToPointer getGnomeKeyringInfoStruct() {
         // First make sure we can access gnome-keyring (ssh session may have trouble accessing gnome-keyring)     
         final GnomeKeyringLibrary.PointerToPointer keyring_info_container = new GnomeKeyringLibrary.PointerToPointer();
         final int ret  = INSTANCE.gnome_keyring_get_info_sync(
@@ -167,7 +169,7 @@ public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements
     }
 
     private static boolean isGnomeKeyringLibraryAvailable() {
-        if (SystemHelper.isLinux()) {
+        if (isLinux()) {
             try {
                 // First make sure gnome-keyring library exists
                 GnomeKeyringLibrary ignored = GnomeKeyringLibrary.INSTANCE;
@@ -229,6 +231,11 @@ public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements
 
         return null;
     }
+
+    private static boolean isLinux() {
+        return System.getProperty("os.name").equals("Linux");
+    }
+
 
     protected static boolean checkResult(final int retCode, final String message) {
         if (retCode != GnomeKeyringLibrary.GNOME_KEYRING_RESULT_OK) {
