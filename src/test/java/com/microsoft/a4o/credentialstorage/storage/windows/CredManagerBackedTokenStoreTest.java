@@ -4,11 +4,10 @@
 package com.microsoft.a4o.credentialstorage.storage.windows;
 
 import com.microsoft.a4o.credentialstorage.secret.Token;
-import com.microsoft.a4o.credentialstorage.secret.TokenType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 
 public class CredManagerBackedTokenStoreTest {
 
@@ -22,24 +21,10 @@ public class CredManagerBackedTokenStoreTest {
     //low value basic tests that should auto run
     @Test
     public void testCreate() {
-        final String secretValue = "my secret";
+        char[] secretValue = "my secret".toCharArray();
+
         Token token = underTest.create("do not care", secretValue);
 
-        assertEquals("Secret not correct", secretValue, token.getValue());
+        assertArrayEquals("Secret not correct", secretValue, token.getValue());
     }
-
-    @Test
-    public void testGetUsername() {
-        final Token token = new Token("do not care", TokenType.PERSONAL);
-        assertEquals("Username is not correct", CredManagerBackedTokenStore.TOKEN_USERNAME,
-                underTest.getUsername(token));
-    }
-
-    @Test
-    public void testGetCredentialBlob() {
-        final Token token = new Token("do not care", TokenType.PERSONAL);
-        assertEquals("CredentialBlob is not correct", "do not care",
-                underTest.getCredentialBlob(token));
-    }
-
 }

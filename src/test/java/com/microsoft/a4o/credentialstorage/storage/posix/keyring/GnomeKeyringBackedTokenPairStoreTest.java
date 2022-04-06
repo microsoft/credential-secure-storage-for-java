@@ -3,20 +3,7 @@
 
 package com.microsoft.a4o.credentialstorage.storage.posix.keyring;
 
-import com.microsoft.a4o.credentialstorage.helpers.StringHelperTest;
-import com.microsoft.a4o.credentialstorage.secret.TokenPair;
-import com.microsoft.a4o.credentialstorage.storage.posix.XmlHelper;
 import org.junit.Before;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 
 public class GnomeKeyringBackedTokenPairStoreTest {
@@ -52,47 +39,5 @@ public class GnomeKeyringBackedTokenPairStoreTest {
     @Before
     public void setUp() throws Exception {
         underTest = new GnomeKeyringBackedTokenPairStore();
-    }
-
-    @Test
-    public void serializeDeserialize_tokens() {
-        final TokenPair tokenPair = new TokenPair(SAMPLE_ASSESS_TOKEN, SAMPLE_REFRESH_TOKEN);
-
-        final String serialized = underTest.serialize(tokenPair);
-        final TokenPair processed = underTest.deserialize(serialized);
-
-        assertNotNull(processed);
-        assertEquals(tokenPair.getAccessToken(), processed.getAccessToken());
-        assertEquals(tokenPair.getRefreshToken(), processed.getRefreshToken());
-    }
-
-    @Test
-    public void xmlSerialization_roundTrip() throws Exception {
-        final TokenPair tokenPair =
-                new TokenPair("9297fb18-46d0-4846-97ca-ab8dd3b55729", "d15281b1-03f1-4581-90d3-4527d9cf4147");
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        final DocumentBuilder builder = dbf.newDocumentBuilder();
-        final Document serializationDoc = builder.newDocument();
-
-        final Element element = GnomeKeyringBackedTokenPairStore.toXml(tokenPair, serializationDoc);
-
-        serializationDoc.appendChild(element);
-        final String actualXmlString = XmlHelper.toString(serializationDoc);
-        final String expectedXmlString =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<value>\n" +
-                        "    <accessToken>9297fb18-46d0-4846-97ca-ab8dd3b55729</accessToken>\n" +
-                        "    <refreshToken>d15281b1-03f1-4581-90d3-4527d9cf4147</refreshToken>\n" +
-                        "</value>";
-        StringHelperTest.assertLinesEqual(expectedXmlString, actualXmlString);
-
-        final ByteArrayInputStream bais = new ByteArrayInputStream(actualXmlString.getBytes());
-        final Document deserializationDoc = builder.parse(bais);
-        final Element rootNode = deserializationDoc.getDocumentElement();
-
-        final TokenPair actualTokenPair = GnomeKeyringBackedTokenPairStore.fromXml(rootNode);
-
-        assertEquals(tokenPair.getAccessToken().getValue(), actualTokenPair.getAccessToken().getValue());
-        assertEquals(tokenPair.getRefreshToken().getValue(), actualTokenPair.getRefreshToken().getValue());
     }
 }

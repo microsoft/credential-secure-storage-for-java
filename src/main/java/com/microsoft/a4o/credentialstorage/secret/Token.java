@@ -3,48 +3,28 @@
 
 package com.microsoft.a4o.credentialstorage.secret;
 
-import com.microsoft.a4o.credentialstorage.helpers.StringHelper;
-
+import java.util.Arrays;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * A security token, usually acquired by some authentication and identity services.
  */
 public final class Token implements Secret {
-    private static final UUID EMPTY_UUID = new UUID(0, 0);
-
     private final TokenType type;
-    private final String value;
-    private final UUID targetIdentity;
+    private final char[] value;
 
     /**
      * Creates a token object with a value and the specified type for a target identity.
      *
      * @param value token value
      * @param type token type
-     * @param targetIdentity token target identity
      */
-    public Token(final String value, final TokenType type, final UUID targetIdentity) {
-        if (StringHelper.isNullOrWhiteSpace(value)) {
-            throw new IllegalArgumentException("The value parameter is null or invalid");
-        }
+    public Token(final char[] value, final TokenType type) {
+        Objects.requireNonNull(value, "The value parameter is null");
         Objects.requireNonNull(type, "The type parameter is null");
-        Objects.requireNonNull(targetIdentity, "The targetIdentity parameter is null");
 
         this.type = type;
         this.value = value;
-        this.targetIdentity = targetIdentity;
-    }
-
-    /**
-     * Creates a token object with a value and the specified type with zero UUID as a target identity.
-     *
-     * @param value token value
-     * @param type token type
-     */
-    public Token(final String value, final TokenType type) {
-        this(value, type, EMPTY_UUID);
     }
 
     /**
@@ -59,16 +39,8 @@ public final class Token implements Secret {
      * The raw contents of the token.
      * @return token value
      */
-    public String getValue() {
+    public char[] getValue() {
         return value;
-    }
-
-    /**
-     * The target identity for the security token.
-     * @return token target identity
-     */
-    public UUID getTargetIdentity() {
-        return targetIdentity;
     }
 
     /**
@@ -82,7 +54,7 @@ public final class Token implements Secret {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Token token = (Token) o;
-        return type == token.type && value.equals(token.value) && targetIdentity.equals(token.targetIdentity);
+        return type == token.type && Arrays.equals(value, token.value);
     }
 
     /**
@@ -92,6 +64,6 @@ public final class Token implements Secret {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(type, value, targetIdentity);
+        return Objects.hash(type, Arrays.hashCode(value));
     }
 }

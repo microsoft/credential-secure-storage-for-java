@@ -4,25 +4,25 @@
 package com.microsoft.a4o.credentialstorage.storage.windows;
 
 import com.microsoft.a4o.credentialstorage.secret.Credential;
-import com.microsoft.a4o.credentialstorage.storage.windows.internal.CredManagerBackedSecureStore;
+
+import java.util.Objects;
 
 /**
  * Credential Manager store for a credential.
  */
 public final class CredManagerBackedCredentialStore extends CredManagerBackedSecureStore<Credential> {
-
     @Override
-    protected Credential create(final String username, final String secret) {
-        return new Credential(username, secret) ;
+    public boolean add(final String key, final Credential secret) {
+        Objects.requireNonNull(key, "key cannot be null");
+        Objects.requireNonNull(secret, "secret cannot be null");
+
+        logger.info("Adding secret for {}", key);
+
+        return writeSecret(key, secret.getUsername(), secret.getPassword());
     }
 
     @Override
-    protected String getUsername(final Credential cred) {
-        return cred.getUsername();
-    }
-
-    @Override
-    protected String getCredentialBlob(final Credential cred) {
-        return cred.getPassword();
+    protected Credential create(final String username, final char[] secret) {
+        return new Credential(username, secret);
     }
 }

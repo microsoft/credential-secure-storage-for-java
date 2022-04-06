@@ -18,29 +18,13 @@ import java.util.Objects;
  * @param <E> secret class to store
  */
 public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements SecretStore<E> {
-
     private static final Logger logger = LoggerFactory.getLogger(GnomeKeyringBackedSecureStore.class);
 
-    private static final GnomeKeyringLibrary INSTANCE = getGnomeKeyringLibrary();
-    private static final GnomeKeyringLibrary.GnomeKeyringPasswordSchema SCHEMA = getGnomeKeyringPasswordSchema();
+    protected static final GnomeKeyringLibrary INSTANCE = getGnomeKeyringLibrary();
+    protected static final GnomeKeyringLibrary.GnomeKeyringPasswordSchema SCHEMA = getGnomeKeyringPasswordSchema();
 
     protected static final String ALLOW_UNLOCK_KEYRING = "AUTH_LIB_ALLOW_UNLOCK_GNOME_KEYRING";
 
-    /**
-     * Create a {@code Secret} from the stored string representation
-     *
-     * @param secret password, oauth2 access token, or Personal Access Token
-     * @return a {@code Secret} from the input
-     */
-    protected abstract E deserialize(final String secret);
-
-    /**
-     * Create a string representation suitable to be saved as String
-     *
-     * @param secret password, oauth2 access token, or Personal Access Token
-     * @return a string representation of the secret
-     */
-    protected abstract String serialize(final E secret);
 
     /**
      * Return the type of this secure store, used to match the secret in GNOME Keyring
@@ -48,39 +32,6 @@ public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements
      * @return type string representation of the secret type
      */
     protected abstract String getType();
-
-    /**
-     * Read a secret from GNOME Keyring using its simple password API
-     *
-     * @param key for which a secret is associated with
-     * @return secret
-     */
-    @Override
-    public E get(final String key) {
-        Objects.requireNonNull(key, "key cannot be null");
-
-        logger.info("Getting {} for {}", getType(), key);
-
-        GnomeKeyringLibrary.PointerToPointer pPassword = new GnomeKeyringLibrary.PointerToPointer();
-        String secret = null;
-        try {
-            final int result = INSTANCE.gnome_keyring_find_password_sync(
-                        SCHEMA,
-                        pPassword,
-                        "Type", getType(),
-                        "Key", key,
-                        null);
-            if (checkResult(result, "Could not retrieve secret from storage.")) {
-                secret = pPassword.pointer.getString(0);
-            }
-        } finally {
-            if (pPassword.pointer != null) {
-                    INSTANCE.gnome_keyring_free_password(pPassword.pointer);
-            }
-        }
-
-        return secret != null ? deserialize(secret) : null;
-    }
 
     @Override
     public boolean delete(final String key) {
@@ -96,27 +47,6 @@ public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements
         return checkResult(result, "Could not delete secret from storage");
     }
 
-    @Override
-    public boolean add(final String key, E secret) {
-        Objects.requireNonNull(key, "key cannot be null");
-        Objects.requireNonNull(secret, "Secret cannot be null");
-
-        logger.info("Adding a {} for {}", getType(), key);
-
-        final int result = INSTANCE.gnome_keyring_store_password_sync(
-                SCHEMA,
-                GnomeKeyringLibrary.GNOME_KEYRING_DEFAULT, // save to disk
-                key, //display name
-                serialize(secret),
-                //attributes list
-                "Type", getType(),
-                "Key", key,
-                null
-        );
-
-        return checkResult(result, "Could not save secret to the storage.");
-    }
-
     /**
      * GNOME Keyring is considered secure
      *
@@ -125,6 +55,28 @@ public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements
     @Override
     public boolean isSecure() {
         return true;
+    }
+
+    protected char[] getSecret(final String key) {
+        final GnomeKeyringLibrary.PointerToPointer pPassword = new GnomeKeyringLibrary.PointerToPointer();
+        char[] secret = null;
+        try {
+            final int result = INSTANCE.gnome_keyring_find_password_sync(
+                    SCHEMA,
+                    pPassword,
+                    "Type", getType(),
+                    "Key", key,
+                    null);
+            if (checkResult(result, "Could not retrieve secret from storage.")) {
+                secret = pPassword.pointer.getString(0).toCharArray();
+            }
+        } finally {
+            if (pPassword.pointer != null) {
+                INSTANCE.gnome_keyring_free_password(pPassword.pointer);
+            }
+        }
+
+        return secret;
     }
 
     /**
@@ -278,7 +230,7 @@ public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements
         return null;
     }
 
-    private static boolean checkResult(final int retCode, final String message) {
+    protected static boolean checkResult(final int retCode, final String message) {
         if (retCode != GnomeKeyringLibrary.GNOME_KEYRING_RESULT_OK) {
             logger.error(message);
             try {

@@ -3,16 +3,18 @@
 
 package com.microsoft.a4o.credentialstorage.secret;
 
-import com.microsoft.a4o.credentialstorage.helpers.StringHelper;
-
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
  * Credential for user authentication.
  */
 public final class Credential implements Secret {
+    private static final int USERNAME_MAX_LENGTH = 511;
+    private static final int PASSWORD_MAX_LENGTH = 2047;
+
     private final String username;
-    private final String password;
+    private final char[] password;
 
     /**
      * Creates a credential object with a username and password pair.
@@ -20,18 +22,20 @@ public final class Credential implements Secret {
      * @param username The username value of the {@link Credential}.
      * @param password The password value of the {@link Credential}.
      */
-    public Credential(final String username, final String password) {
-        this.username = Objects.requireNonNullElse(username, StringHelper.EMPTY);
-        this.password = Objects.requireNonNullElse(password, StringHelper.EMPTY);
-    }
+    public Credential(final String username, final char[] password) {
+        Objects.requireNonNull(username, "The username parameter is null");
+        if (username.length() > USERNAME_MAX_LENGTH) {
+            throw new IllegalArgumentException(String.format("The username parameter cannot " +
+                    "be longer than %1$d characters.", USERNAME_MAX_LENGTH));
+        }
+        this.username = username;
 
-    /**
-     * Creates a credential object with only a username.
-     *
-     * @param username The username value of the {@link Credential}.
-     */
-    public Credential(final String username) {
-        this(username, StringHelper.EMPTY);
+        Objects.requireNonNull(password, "The password parameter is null");
+        if (password.length > PASSWORD_MAX_LENGTH) {
+            throw new IllegalArgumentException(String.format("The password parameter cannot " +
+                    "be longer than %1$d characters.", PASSWORD_MAX_LENGTH));
+        }
+        this.password = password;
     }
 
     /**
@@ -46,7 +50,7 @@ public final class Credential implements Secret {
      * Secret related to the username.
      * @return secret
      */
-    public String getPassword() {
+    public char[] getPassword() {
         return password;
     }
 
@@ -57,11 +61,11 @@ public final class Credential implements Secret {
      * @return True if equal; false otherwise.
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Credential that = (Credential) o;
-        return username.equals(that.username) && password.equals(that.password);
+        return username.equals(that.username) && Arrays.equals(password, that.password);
     }
 
     /**
@@ -71,6 +75,6 @@ public final class Credential implements Secret {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(username, password);
+        return Objects.hash(username, Arrays.hashCode(password));
     }
 }

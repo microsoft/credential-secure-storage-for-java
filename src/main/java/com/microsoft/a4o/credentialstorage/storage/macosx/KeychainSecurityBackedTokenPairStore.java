@@ -6,6 +6,8 @@ package com.microsoft.a4o.credentialstorage.storage.macosx;
 import com.microsoft.a4o.credentialstorage.storage.SecretStore;
 import com.microsoft.a4o.credentialstorage.secret.TokenPair;
 
+import java.util.Map;
+
 /**
  * Keychain store for a token pair.
  */
@@ -13,12 +15,40 @@ public final class KeychainSecurityBackedTokenPairStore extends KeychainSecurity
 
     @Override
     public TokenPair get(final String key) {
-        return readTokenPair(key);
+        char[] accessToken, refreshToken;
+
+        final Map<String, Object> accessTokenMetaData = read(SecretKind.TokenPair_Access_Token, key);
+
+        if (accessTokenMetaData.size() > 0) {
+            accessToken = (char[]) accessTokenMetaData.get(PASSWORD);
+        } else {
+            accessToken = null;
+        }
+
+        final Map<String, Object> refreshTokenMetaData = read(SecretKind.TokenPair_Refresh_Token, key);
+
+        if (refreshTokenMetaData.size() > 0) {
+            refreshToken = (char[]) refreshTokenMetaData.get(PASSWORD);
+        } else {
+            refreshToken = null;
+        }
+
+        if (accessToken != null && refreshToken != null) {
+            return new TokenPair(accessToken, refreshToken);
+        }
+
+        return null;
     }
 
     @Override
-    public boolean add(final String key, final TokenPair secret) {
-        writeTokenPair(key, secret);
+    public boolean add(final String key, final TokenPair tokenPair) {
+        if (tokenPair.getAccessToken().getValue() != null) {
+            writeTokenKind(key, SecretKind.TokenPair_Access_Token, tokenPair.getAccessToken());
+        }
+
+        if (tokenPair.getRefreshToken().getValue() != null) {
+            writeTokenKind(key, SecretKind.TokenPair_Refresh_Token, tokenPair.getRefreshToken());
+        }
         return true;
     }
 

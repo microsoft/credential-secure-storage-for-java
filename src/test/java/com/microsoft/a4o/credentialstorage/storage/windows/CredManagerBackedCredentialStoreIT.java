@@ -18,7 +18,7 @@ public class CredManagerBackedCredentialStoreIT {
 
     private CredManagerBackedCredentialStore underTest;
     private final String username = "myusername";
-    private final String password = "mypassword";
+    private final char[] password = "mypassword".toCharArray();
 
     @Before
     public void setup() throws Exception {

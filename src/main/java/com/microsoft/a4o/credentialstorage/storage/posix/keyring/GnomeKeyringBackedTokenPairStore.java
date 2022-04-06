@@ -3,124 +3,80 @@
 
 package com.microsoft.a4o.credentialstorage.storage.posix.keyring;
 
-import com.microsoft.a4o.credentialstorage.helpers.StringHelper;
 import com.microsoft.a4o.credentialstorage.secret.TokenPair;
-import com.microsoft.a4o.credentialstorage.storage.posix.XmlHelper;
+import com.microsoft.a4o.credentialstorage.storage.posix.internal.GnomeKeyringLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.Objects;
 
 /**
  * GNOME Keyring store for a token pair.
  */
 public final class GnomeKeyringBackedTokenPairStore extends GnomeKeyringBackedSecureStore<TokenPair> {
-
     private static final Logger logger = LoggerFactory.getLogger(GnomeKeyringBackedTokenPairStore.class);
+    public static final String ACCESS_TOKEN = "/accessToken";
+    public static final String REFRESH_TOKEN = "/refreshToken";
 
+    /**
+     * Read a secret from GNOME Keyring using its simple password API
+     *
+     * @param key for which a secret is associated with
+     * @return secret
+     */
     @Override
-    protected String serialize(final TokenPair tokenPair) {
-        Objects.requireNonNull(tokenPair, "TokenPair cannot be null");
+    public TokenPair get(final String key) {
+        Objects.requireNonNull(key, "key cannot be null");
 
-        return toXmlString(tokenPair);
+        logger.info("Getting {} for {}", getType(), key);
+
+        final char[] secretAccess = getSecret(key + ACCESS_TOKEN);
+        final char[] secretRefresh = getSecret(key + REFRESH_TOKEN);
+
+        // no token found
+        if (secretAccess == null && secretRefresh == null) {
+            return null;
+        }
+
+        return new TokenPair(secretAccess, secretRefresh);
     }
 
     @Override
-    protected TokenPair deserialize(final String secret) {
-        Objects.requireNonNull(secret, "secret cannot be null");
+    public boolean add(final String key, TokenPair secret) {
+        Objects.requireNonNull(key, "key cannot be null");
+        Objects.requireNonNull(secret, "Secret cannot be null");
 
-        try {
-            return fromXmlString(secret);
-        } catch (final Exception e) {
-            logger.error("Failed to deserialize the stored secret. Return null.", e);
-            return null;
-        }
+        logger.info("Adding a {} for {}", getType(), key);
+
+        int result = INSTANCE.gnome_keyring_store_password_sync(
+                SCHEMA,
+                GnomeKeyringLibrary.GNOME_KEYRING_DEFAULT, // save to disk
+                key + ACCESS_TOKEN, //display name
+                new String(secret.getAccessToken().getValue()),
+                //attributes list
+                "Type", getType(),
+                "Key", key,
+                null
+        );
+
+        checkResult(result, "Could not save access token to the storage.");
+
+        result = INSTANCE.gnome_keyring_store_password_sync(
+                SCHEMA,
+                GnomeKeyringLibrary.GNOME_KEYRING_DEFAULT, // save to disk
+                key + REFRESH_TOKEN, //display name
+                new String(secret.getRefreshToken().getValue()),
+                //attributes list
+                "Type", getType(),
+                "Key", key,
+                null
+        );
+
+        return checkResult(result, "Could not save refresh token to the storage.");
     }
 
     @Override
     protected String getType() {
         return "OAuth2Token";
-    }
-
-    static TokenPair fromXml(final Node tokenPairNode) {
-        TokenPair value;
-
-        String accessToken = null;
-        String refreshToken = null;
-
-        final NodeList propertyNodes = tokenPairNode.getChildNodes();
-        for (int v = 0; v < propertyNodes.getLength(); v++) {
-            final Node propertyNode = propertyNodes.item(v);
-            final String propertyName = propertyNode.getNodeName();
-            if ("accessToken".equals(propertyName)) {
-                accessToken = XmlHelper.toString(propertyNode);
-            } else if ("refreshToken".equals(propertyName)) {
-                refreshToken = XmlHelper.toString(propertyNode);
-            }
-        }
-
-        value = new TokenPair(accessToken, refreshToken);
-        return value;
-    }
-
-    static Element toXml(final TokenPair tokenPair, final Document document) {
-        final Element valueNode = document.createElement("value");
-
-        final Element accessTokenNode = document.createElement("accessToken");
-        final Text accessTokenValue = document.createTextNode(tokenPair.getAccessToken().getValue());
-        accessTokenNode.appendChild(accessTokenValue);
-        valueNode.appendChild(accessTokenNode);
-
-        final Element refreshTokenNode = document.createElement("refreshToken");
-        final Text refreshTokenValue = document.createTextNode(tokenPair.getRefreshToken().getValue());
-        refreshTokenNode.appendChild(refreshTokenValue);
-        valueNode.appendChild(refreshTokenNode);
-
-        return valueNode;
-    }
-
-    private static String toXmlString(final TokenPair tokenPair) {
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        try {
-            final DocumentBuilder builder = dbf.newDocumentBuilder();
-            final Document document = builder.newDocument();
-
-            final Element element = toXml(tokenPair, document);
-            document.appendChild(element);
-
-            return XmlHelper.toString(document);
-        }
-        catch (final Exception e) {
-            throw new Error(e);
-        }
-    }
-
-    private static TokenPair fromXmlString(final String xmlString) {
-        final byte[] bytes = StringHelper.UTF8GetBytes(xmlString);
-        final ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-        return fromXmlStream(inputStream);
-    }
-
-    private static TokenPair fromXmlStream(final InputStream source) {
-        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        try {
-            final DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
-            final Document document = builder.parse(source);
-            final Element rootElement = document.getDocumentElement();
-
-            return fromXml(rootElement);
-        }
-        catch (final Exception e) {
-            throw new Error(e);
-        }
     }
 }

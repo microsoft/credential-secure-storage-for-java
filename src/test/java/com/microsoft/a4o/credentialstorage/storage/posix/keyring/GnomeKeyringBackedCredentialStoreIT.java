@@ -28,7 +28,7 @@ public class GnomeKeyringBackedCredentialStoreIT {
     public void saveCredential() {
         final String testKey = "http://thisisatestkey";
 
-        final Credential credential = new Credential("username", "pass:\"word");
+        final Credential credential = new Credential("username", "pass:\"word".toCharArray());
         boolean added = underTest.add(testKey, credential);
 
         assertTrue(added);

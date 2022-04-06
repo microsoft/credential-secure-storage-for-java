@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See License.txt in the project root.
 
-package com.microsoft.a4o.credentialstorage.storage.windows.internal;
+package com.microsoft.a4o.credentialstorage.storage.windows;
 
 import com.sun.jna.LastErrorException;
 import com.sun.jna.Memory;

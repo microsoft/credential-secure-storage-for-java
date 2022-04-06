@@ -30,19 +30,21 @@ public class CredManagerBackedTokenPairStoreIT {
     public void saveTokenPair() {
         final String testKey = "http://thisisatestkey";
 
-        final TokenPair tokenPair = new TokenPair(sampleAccessToken, sampleRefreshToken);
+        final TokenPair tokenPair = new TokenPair(sampleAccessToken.toCharArray(), sampleRefreshToken.toCharArray());
         boolean added = underTest.add(testKey, tokenPair);
 
         assertTrue(added);
 
         final TokenPair readValue = underTest.get(testKey);
 
+        assertNotNull("Token pair not found", readValue);
+
         // Only save refresh token
-        assertEquals(underTest.getUsername(readValue), readValue.getAccessToken().getValue());
-        assertEquals(tokenPair.getRefreshToken().getValue(), readValue.getRefreshToken().getValue());
+        assertArrayEquals(tokenPair.getAccessToken().getValue(), readValue.getAccessToken().getValue());
+        assertArrayEquals(tokenPair.getRefreshToken().getValue(), readValue.getRefreshToken().getValue());
 
         boolean deleted = underTest.delete(testKey);
-        assertTrue(deleted);
+        assertTrue("Token pair not deleted", deleted);
 
         final TokenPair nonExistent = underTest.get(testKey);
         assertNull(nonExistent);

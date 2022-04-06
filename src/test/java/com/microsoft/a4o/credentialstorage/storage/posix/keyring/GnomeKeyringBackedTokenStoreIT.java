@@ -8,7 +8,8 @@ import com.microsoft.a4o.credentialstorage.secret.TokenType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
@@ -29,14 +30,15 @@ public class GnomeKeyringBackedTokenStoreIT {
     public void saveToken() {
         final String testKey = "http://thisisatestkey";
 
-        final Token token = new Token("bi4295xkwev6djxej7hpffuoo4rzcqcogakubpu2sd7kopuoquaq", TokenType.PERSONAL);
+        final Token token = new Token("bi4295xkwev6djxej7hpffuoo4rzcqcogakubpu2sd7kopuoquaq".toCharArray(), TokenType.PERSONAL);
         boolean added = underTest.add(testKey, token);
 
         assertTrue(added);
 
         final Token readValue = underTest.get(testKey);
 
-        assertEquals(token.getValue(), readValue.getValue());
+        assertNotNull(readValue);
+        assertArrayEquals(token.getValue(), readValue.getValue());
 
         boolean deleted = underTest.delete(testKey);
         assertTrue(deleted);

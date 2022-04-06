@@ -9,8 +9,9 @@ import com.microsoft.a4o.credentialstorage.secret.TokenType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
@@ -28,16 +29,17 @@ public class CredManagerBackedTokenStoreIT {
 
     @Test
     public void e2eTestStoreReadDelete() {
-        final Token token = new Token("do not care", TokenType.PERSONAL);
+        final Token token = new Token("do not care".toCharArray(), TokenType.PERSONAL);
         final String key = "CredManagerTest:http://test.com:Token";
 
         // this should have been saved to cred manager, it would be good if you can set a breakpoint
-        // and manaully verify this now
+        // and manually verify this now
         underTest.add(key, token);
 
         Token readToken = underTest.get(key);
 
-        assertEquals("Retrieved token is different", token.getValue(), readToken.getValue());
+        assertNotNull("Token not found", readToken);
+        assertArrayEquals("Retrieved token is different", token.getValue(), readToken.getValue());
 
         // The token under the specified key should be deleted now, it's a good idea to manually verify this now
         boolean deleted = underTest.delete(key);
@@ -47,7 +49,7 @@ public class CredManagerBackedTokenStoreIT {
         assertFalse("Test token deleted twice, did first delete fail?", deleted);
 
         readToken = underTest.get(key);
-        assertNull("Token can still be read from store?  Did delete fail?", readToken);
+        assertNull("Token can still be read from store? Did delete fail?", readToken);
     }
 
 }

@@ -3,11 +3,7 @@
 
 package com.microsoft.a4o.credentialstorage.storage.macosx;
 
-import com.microsoft.a4o.credentialstorage.helpers.StringHelper;
-import com.microsoft.a4o.credentialstorage.secret.Credential;
 import com.microsoft.a4o.credentialstorage.secret.Token;
-import com.microsoft.a4o.credentialstorage.secret.TokenPair;
-import com.microsoft.a4o.credentialstorage.secret.TokenType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +13,6 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,8 +23,6 @@ class KeychainSecurityCliStore {
     private static final String FIND_GENERIC_PASSWORD = "find-generic-password";
     private static final String ADD_GENERIC_PASSWORD = "add-generic-password";
     private static final String ACCOUNT_PARAMETER = "-a";
-    private static final String ACCOUNT_METADATA = "acct";
-    private static final String PASSWORD = "password";
     private static final String SERVICE_PARAMETER = "-s";
     private static final String KIND_PARAMETER = "-D";
     private static final String PASSWORD_PARAMETER = "-w";
@@ -38,7 +31,8 @@ class KeychainSecurityCliStore {
     private static final int USER_INTERACTION_NOT_ALLOWED_EXIT_CODE = 36;
     private static final String INTERACTIVE_MODE = "-i";
 
-    private static final Function<String, String> QUOTING_PROCESSOR = str -> str.contains(" ") ? '"' + str + '"' : str;
+    protected static final String ACCOUNT_METADATA = "acct";
+    protected static final String PASSWORD = "password";
 
     private static final Pattern MetadataLinePattern = Pattern.compile
             (
@@ -252,9 +246,9 @@ class KeychainSecurityCliStore {
         if (isNullValue) {
             destination.put(key.toString(), null);
         } else if ("blob".equals(type.toString())) {
-            final int lastCharIndex = value.length() - 1;
-            value.deleteCharAt(lastCharIndex);
-            destination.put(key.toString(), value.toString());
+            char[] valueCharArray = new char[value.length() - 1];
+            value.getChars(0, value.length() - 1, valueCharArray, 0);
+            destination.put(key.toString(), valueCharArray);
         }
         // TODO: else if ("timedate".equals(type))
         // TODO: else if ("uint32".equals(type))
@@ -273,7 +267,7 @@ class KeychainSecurityCliStore {
         }
     }
 
-    private static Map<String, Object> read(final SecretKind secretKind, final String serviceName) {
+    protected static Map<String, Object> read(final SecretKind secretKind, final String serviceName) {
         final String stdOut, stdErr;
         try {
             final ProcessBuilder processBuilder = new ProcessBuilder(
@@ -302,72 +296,14 @@ class KeychainSecurityCliStore {
         return metaData;
     }
 
-    public Credential readCredentials(final String targetName) {
-        final Map<String, Object> metaData = read(SecretKind.Credential, targetName);
-
-        final Credential result;
-        if (metaData.size() > 0) {
-            final String userName = (String) metaData.get(ACCOUNT_METADATA);
-            final String password = (String) metaData.get(PASSWORD);
-
-            result = new Credential(userName, password);
-        } else {
-            result = null;
-        }
-
-        return result;
-    }
-
-    public Token readToken(final String targetName) {
-        final Map<String, Object> metaData = read(SecretKind.Token, targetName);
-
-        final Token result;
-        if (metaData.size() > 0) {
-            final String typeName = (String) metaData.get(ACCOUNT_METADATA);
-            final String password = (String) metaData.get(PASSWORD);
-
-            result = new Token(password, TokenType.valueOf(typeName));
-        } else {
-            result = null;
-        }
-
-        return result;
-    }
-
-    public TokenPair readTokenPair(final String targetName) {
-        String accessToken, refreshToken;
-
-        final Map<String, Object> accessTokenMetaData = read(SecretKind.TokenPair_Access_Token, targetName);
-
-        if (accessTokenMetaData.size() > 0) {
-            accessToken = (String) accessTokenMetaData.get(PASSWORD);
-        } else {
-            accessToken = null;
-        }
-
-        final Map<String, Object> refreshTokenMetaData = read(SecretKind.TokenPair_Refresh_Token, targetName);
-
-        if (refreshTokenMetaData.size() > 0) {
-            refreshToken = (String) refreshTokenMetaData.get(PASSWORD);
-        } else {
-            refreshToken = null;
-        }
-
-        if (accessToken != null && refreshToken != null) {
-            return new TokenPair(accessToken, refreshToken);
-        }
-
-        return null;
-    }
-
-    private static void write(final SecretKind secretKind, final String serviceName, final String accountName, final String password) {
+    protected static void write(final SecretKind secretKind, final String serviceName, final String accountName, final char[] password) {
         final String stdOut, stdErr;
         try {
             final ProcessBuilder addProcessBuilder = new ProcessBuilder(
                 SECURITY,
                 INTERACTIVE_MODE
             );
-            final String[] commandParts = {
+            final Object[] commandParts = {
                 ADD_GENERIC_PASSWORD,
                 UPDATE_IF_ALREADY_EXISTS,
                 ACCOUNT_PARAMETER, accountName,
@@ -376,10 +312,9 @@ class KeychainSecurityCliStore {
                 KIND_PARAMETER, secretKind.name()
             };
             final Process process = addProcessBuilder.start();
-            final String command = StringHelper.join(" ", commandParts, 0, commandParts.length, QUOTING_PROCESSOR);
 
             try (final PrintWriter writer = new PrintWriter(process.getOutputStream())) {
-                writer.println(command);
+                printQuotedObjects(writer, commandParts);
             }
 
             final int result = process.waitFor();
@@ -391,27 +326,9 @@ class KeychainSecurityCliStore {
         }
     }
 
-    public void writeCredential(final String targetName, final Credential credentials) {
-        write(SecretKind.Credential, targetName, credentials.getUsername(), credentials.getPassword());
-    }
-
-    public void writeToken(final String targetName, final Token token) {
-        writeTokenKind(targetName, SecretKind.Token, token);
-    }
-
-    private void writeTokenKind(final String targetName, final SecretKind secretKind, final Token token) {
+    protected void writeTokenKind(final String targetName, final SecretKind secretKind, final Token token) {
         final String accountName = token.getType().name();
         write(secretKind, targetName, accountName, token.getValue());
-    }
-
-    public void writeTokenPair(final String targetName, final TokenPair tokenPair) {
-        if (tokenPair.getAccessToken().getValue() != null) {
-            writeTokenKind(targetName, SecretKind.TokenPair_Access_Token, tokenPair.getAccessToken());
-        }
-
-        if (tokenPair.getRefreshToken().getValue() != null) {
-            writeTokenKind(targetName, SecretKind.TokenPair_Refresh_Token, tokenPair.getRefreshToken());
-        }
     }
 
     private static String readToString(final InputStream stream) throws IOException {
@@ -426,4 +343,14 @@ class KeychainSecurityCliStore {
         }
     }
 
+    private static void printQuotedObjects(final PrintWriter writer, final Object[] value) {
+        for (int i = 0; i < value.length; i++) {
+            if (i > 0) {
+                writer.print(' ');
+            }
+            writer.print('"');
+            writer.print(value[i]);
+            writer.print('"');
+        }
+    }
 }

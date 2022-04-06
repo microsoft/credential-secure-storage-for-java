@@ -16,7 +16,7 @@ public class KeychainSecurityBackedCredentialStoreIT {
 
     private KeychainSecurityBackedCredentialStore underTest;
     private final String username = "myusername";
-    private final String password = "mypassword";
+    private final char[] password = "mypassword".toCharArray();
 
     @Before
     public void setUp() throws Exception {

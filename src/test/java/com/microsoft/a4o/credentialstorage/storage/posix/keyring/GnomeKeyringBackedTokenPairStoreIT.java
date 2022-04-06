@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
@@ -54,13 +55,14 @@ public class GnomeKeyringBackedTokenPairStoreIT {
     public void saveTokenPair() {
         final String testKey = "http://thisisatestkey";
 
-        final TokenPair tokenPair = new TokenPair(SAMPLE_ACCESS_TOKEN, SAMPLE_REFRESH_TOKEN);
+        final TokenPair tokenPair = new TokenPair(SAMPLE_ACCESS_TOKEN.toCharArray(), SAMPLE_REFRESH_TOKEN.toCharArray());
         boolean added = underTest.add(testKey, tokenPair);
 
         assertTrue(added);
 
         final TokenPair readValue = underTest.get(testKey);
 
+        assertNotNull(readValue);
         assertEquals(tokenPair.getAccessToken(), readValue.getAccessToken());
         assertEquals(tokenPair.getRefreshToken(), readValue.getRefreshToken());
 

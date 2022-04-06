@@ -26,7 +26,7 @@ public class KeychainSecurityBackedTokenStoreIT {
 
     @Test
     public void e2eTestStoreReadDelete() {
-        final Token token = new Token("do not care", TokenType.PERSONAL);
+        final Token token = new Token("do not care".toCharArray(), TokenType.PERSONAL);
         final String key = "KeychainTest:http://test.com:Token";
 
         // this should have been saved to cred manager, it would be good if you can set a breakpoint

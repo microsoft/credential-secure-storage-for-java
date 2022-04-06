@@ -3,8 +3,6 @@
 
 package com.microsoft.a4o.credentialstorage.secret;
 
-import com.microsoft.a4o.credentialstorage.helpers.StringHelper;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -15,7 +13,20 @@ import java.util.Objects;
 public final class TokenPair implements Secret {
     private final Token accessToken;
     private final Token refreshToken;
-    private final Map<String, String> parameters;
+
+    /**
+     * Creates a new {@link TokenPair} from raw access and refresh token data.
+     *
+     * @param accessToken  The base64 encoded value of the access token's raw data
+     * @param refreshToken The base64 encoded value of the refresh token's raw data
+     */
+    public TokenPair(final Token accessToken, final Token refreshToken) {
+        Objects.requireNonNull(accessToken, "The accessToken parameter is null");
+        Objects.requireNonNull(refreshToken, "The refreshToken parameter is null");
+
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
 
     /**
      * Creates a new {@link TokenPair} from raw access and refresh token data.
@@ -24,18 +35,13 @@ public final class TokenPair implements Secret {
      * @param refreshToken The base64 encoded value of the refresh token's raw data
      * @param parameters Map with additional parameters for the token pair
      */
-    public TokenPair(final String accessToken, final String refreshToken, final Map<String, String> parameters) {
-        if (StringHelper.isNullOrWhiteSpace(accessToken)) {
-            throw new IllegalArgumentException("The accessToken parameter is null or invalid.");
-        }
-        if (StringHelper.isNullOrWhiteSpace(refreshToken)) {
-            throw new IllegalArgumentException("The refreshToken parameter is null or invalid.");
-        }
+    public TokenPair(final char[] accessToken, final char[] refreshToken, final Map<String, String> parameters) {
+        Objects.requireNonNull(accessToken, "The accessToken parameter is null");
+        Objects.requireNonNull(refreshToken, "The refreshToken parameter is null");
         Objects.requireNonNull(parameters, "The parameters parameter is null");
 
         this.accessToken = new Token(accessToken, TokenType.ACCESS);
         this.refreshToken = new Token(refreshToken, TokenType.REFRESH);
-        this.parameters = Map.copyOf(parameters);
     }
 
     /**
@@ -44,7 +50,7 @@ public final class TokenPair implements Secret {
      * @param accessToken  The base64 encoded value of the access token's raw data
      * @param refreshToken The base64 encoded value of the refresh token's raw data
      */
-    public TokenPair(final String accessToken, final String refreshToken) {
+    public TokenPair(final char[] accessToken, final char[] refreshToken) {
         this(accessToken, refreshToken, Collections.emptyMap());
     }
 
@@ -65,14 +71,6 @@ public final class TokenPair implements Secret {
     }
 
     /**
-     * Additional token parameters.
-     * @return token additional parameters
-     */
-    public Map<String, String> getParameters() {
-        return parameters;
-    }
-
-    /**
      * Compares an object to this.
      *
      * @param o The object to compare.
@@ -84,8 +82,7 @@ public final class TokenPair implements Secret {
         if (o == null || getClass() != o.getClass()) return false;
         TokenPair tokenPair = (TokenPair) o;
         return accessToken.equals(tokenPair.accessToken)
-                && refreshToken.equals(tokenPair.refreshToken)
-                && parameters.equals(tokenPair.parameters);
+                && refreshToken.equals(tokenPair.refreshToken);
     }
 
     /**
@@ -95,6 +92,6 @@ public final class TokenPair implements Secret {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(accessToken, refreshToken, parameters);
+        return Objects.hash(accessToken, refreshToken);
     }
 }

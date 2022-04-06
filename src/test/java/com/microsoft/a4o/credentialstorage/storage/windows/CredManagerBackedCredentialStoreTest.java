@@ -7,13 +7,14 @@ import com.microsoft.a4o.credentialstorage.secret.Credential;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class CredManagerBackedCredentialStoreTest {
 
     private CredManagerBackedCredentialStore underTest;
     private final String username = "myusername";
-    private final String password = "mypassword";
+    private final char[] password = "mypassword".toCharArray();
 
     @Before
     public void setup() throws Exception {
@@ -22,25 +23,10 @@ public class CredManagerBackedCredentialStoreTest {
 
     //low value basic tests that should auto run
     @Test
-    public void testCreate() throws Exception {
-        Credential credential= underTest.create(username, password);
+    public void testCreate() {
+        Credential credential = underTest.create(username, password);
 
         assertEquals("Username not correct", username, credential.getUsername());
-        assertEquals("Password not correct", password, credential.getPassword());
-    }
-
-    @Test
-    public void testGetUsername() throws Exception {
-        Credential credential= new Credential(username, password);
-
-        assertEquals("Username is not correct", username, underTest.getUsername(credential));
-    }
-
-    @Test
-    public void testGetCredentialBlob() throws Exception {
-        Credential credential= new Credential(username, password);
-
-        assertEquals("CredentialBlob is not correct", password,
-                underTest.getCredentialBlob(credential));
+        assertArrayEquals("Password not correct", password, credential.getPassword());
     }
 }

@@ -1,9 +1,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See License.txt in the project root.
 
-package com.microsoft.a4o.credentialstorage.storage.windows.internal;
+package com.microsoft.a4o.credentialstorage.storage.windows;
 
-import com.microsoft.a4o.credentialstorage.helpers.StringHelper;
 import com.microsoft.a4o.credentialstorage.helpers.SystemHelper;
 import com.microsoft.a4o.credentialstorage.secret.Secret;
 import com.microsoft.a4o.credentialstorage.storage.SecretStore;
@@ -13,20 +12,26 @@ import com.sun.jna.Pointer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.Function;
+
 
 /**
  * This class exposes functions to interact with Windows Credential Manager
  */
 public abstract class CredManagerBackedSecureStore<E extends Secret> implements SecretStore<E> {
-
-    private static final Logger logger = LoggerFactory.getLogger(CredManagerBackedSecureStore.class);
+    protected static final Logger logger = LoggerFactory.getLogger(CredManagerBackedSecureStore.class);
+    private static final Charset UTF16LE = StandardCharsets.UTF_16LE;
 
     private final CredAdvapi32 INSTANCE = getCredAdvapi32Instance();
 
     /**
-     * Create a {@code Secret} from the string representation
+     * Create a {@code Secret} from the native representation
      *
      * @param username
      *      username for the secret
@@ -35,27 +40,7 @@ public abstract class CredManagerBackedSecureStore<E extends Secret> implements 
      *
      * @return a {@code Secret} from the input
      */
-    protected abstract E create(String username, String secret);
-
-    /**
-     * Get String representation of the UserName field from the {@code Secret}
-     *
-     * @param secret
-     *      A {@code Credential}, {@code Token} or {@code TokenPair}
-     *
-     * @return username from this secret
-     */
-    protected abstract String getUsername(E secret);
-
-    /**
-     * Get String representation of the CredentialBlob field from the secret
-     *
-     * @param secret
-     *      A {@code Credential}, {@code Token} or {@code TokenPair}
-     *
-     * @return credential from this secre
-     */
-    protected abstract String getCredentialBlob(E secret);
+    protected abstract E create(String username, char[] secret);
 
     /**
      * Read calls CredRead on Windows and retrieve the Secret
@@ -66,47 +51,12 @@ public abstract class CredManagerBackedSecureStore<E extends Secret> implements 
      *      TargetName in the credential structure
      */
     @Override
-    public E get(String key) {
+    public E get(final String key) {
         Objects.requireNonNull(key, "key cannot be null");
 
         logger.info("Getting secret for {}", key);
 
-        final CredAdvapi32.PCREDENTIAL pcredential = new CredAdvapi32.PCREDENTIAL();
-        boolean read;
-        E cred;
-
-        try {
-            // MSDN doc doesn't mention threading safety, so let's just be careful and synchronize the access
-            synchronized (INSTANCE) {
-                read = INSTANCE.CredRead(key, CredAdvapi32.CRED_TYPE_GENERIC, 0, pcredential);
-            }
-
-            if (read) {
-                final CredAdvapi32.CREDENTIAL credential = new CredAdvapi32.CREDENTIAL(pcredential.credential);
-
-                byte[] secretBytes = credential.CredentialBlob.getByteArray(0, credential.CredentialBlobSize);
-                final String secret = StringHelper.UTF16LEGetString(secretBytes);
-                final String username = credential.UserName;
-
-                cred = create(username, secret);
-
-            } else {
-                cred = null;
-            }
-
-        } catch (final LastErrorException e) {
-            logger.error("Getting secret failed. {}", e.getMessage());
-            cred = null;
-
-        } finally {
-            if (pcredential.credential != null) {
-                synchronized (INSTANCE) {
-                    INSTANCE.CredFree(pcredential.credential);
-                }
-            }
-        }
-
-        return cred;
+        return readSecret(key, this::createSecret);
     }
 
     /**
@@ -121,19 +71,12 @@ public abstract class CredManagerBackedSecureStore<E extends Secret> implements 
      *      true if delete successful, false otherwise (including key doesn't exist)
      */
     @Override
-    public boolean delete(String key) {
+    public boolean delete(final String key) {
         Objects.requireNonNull(key, "key cannot be null");
 
         logger.info("Deleting secret for {}", key);
 
-        try {
-            synchronized (INSTANCE) {
-                return INSTANCE.CredDelete(key, CredAdvapi32.CRED_TYPE_GENERIC, 0);
-            }
-        } catch (LastErrorException e) {
-            logger.error("Deleting secret failed. {}", e.getMessage());
-            return false;
-        }
+        return deleteSecret(key);
     }
 
     /**
@@ -149,15 +92,60 @@ public abstract class CredManagerBackedSecureStore<E extends Secret> implements 
      *         {@code false} otherwise
      */
     @Override
-    public boolean add(String key, E secret) {
-        Objects.requireNonNull(key, "key cannot be null");
-        Objects.requireNonNull(secret, "Secret cannot be null");
+    public abstract boolean add(String key, E secret);
 
-        logger.info("Adding secret for {}", key);
+    /**
+     * Windows credential manager is considered a secure storage for secrets
+     *
+     * @return {@code true} for Windows Credential Manager
+     */
+    @Override
+    public boolean isSecure() {
+        return true;
+    }
 
-        final String username = getUsername(secret);
-        final String credentialBlob = getCredentialBlob(secret);
-        byte[] credBlob = StringHelper.UTF16LEGetBytes(credentialBlob);
+    private E createSecret(final CredAdvapi32.CREDENTIAL credential) {
+        final char[] secret = getSecret(credential);
+        return create(credential.UserName, secret);
+    }
+
+    protected char[] getSecret(final CredAdvapi32.CREDENTIAL credential) {
+        final byte[] secretData = credential.CredentialBlob.getByteArray(0, credential.CredentialBlobSize);
+        return UTF16LEGetString(secretData);
+    }
+
+    protected <T> T readSecret(final String key, final Function<CredAdvapi32.CREDENTIAL, T> mapper) {
+        T cred = null;
+
+        final CredAdvapi32.PCREDENTIAL pcredential = new CredAdvapi32.PCREDENTIAL();
+        boolean read;
+
+        try {
+            // MSDN doc doesn't mention threading safety, so let's just be careful and synchronize the access
+            synchronized (INSTANCE) {
+                read = INSTANCE.CredRead(key, CredAdvapi32.CRED_TYPE_GENERIC, 0, pcredential);
+            }
+
+            if (read) {
+                final CredAdvapi32.CREDENTIAL credential = new CredAdvapi32.CREDENTIAL(pcredential.credential);
+                cred = mapper.apply(credential);
+            }
+
+        } catch (final LastErrorException e) {
+            logger.error("Getting secret failed. {}", e.getMessage());
+        } finally {
+            if (pcredential.credential != null) {
+                synchronized (INSTANCE) {
+                    INSTANCE.CredFree(pcredential.credential);
+                }
+            }
+        }
+
+        return cred;
+    }
+
+    protected boolean writeSecret(final String key, final String username, final char[] secret) {
+        final byte[] credBlob = UTF16LEGetBytes(secret);
 
         final CredAdvapi32.CREDENTIAL cred = buildCred(key, username, credBlob);
 
@@ -177,17 +165,18 @@ public abstract class CredManagerBackedSecureStore<E extends Secret> implements 
         }
     }
 
-    /**
-     * Windows credential manager is considered a secure storage for secrets
-     *
-     * @return {@code true} for Windows Credential Manager
-     */
-    @Override
-    public boolean isSecure() {
-        return true;
+    protected boolean deleteSecret(final String key) {
+        try {
+            synchronized (INSTANCE) {
+                return INSTANCE.CredDelete(key, CredAdvapi32.CRED_TYPE_GENERIC, 0);
+            }
+        } catch (LastErrorException e) {
+            logger.error("Deleting secret failed. {}", e.getMessage());
+            return false;
+        }
     }
 
-    private CredAdvapi32.CREDENTIAL buildCred(String key, String username, byte[] credentialBlob) {
+    static CredAdvapi32.CREDENTIAL buildCred(final String key, final String username, final byte[] credentialBlob) {
         final CredAdvapi32.CREDENTIAL credential = new CredAdvapi32.CREDENTIAL();
 
         credential.Flags = 0;
@@ -204,11 +193,19 @@ public abstract class CredManagerBackedSecureStore<E extends Secret> implements 
         return credential;
     }
 
-    private Pointer getPointer(byte[] array) {
+    private static Pointer getPointer(final byte[] array) {
         Pointer p = new Memory(array.length);
         p.write(0, array, 0, array.length);
 
         return p;
+    }
+
+    private static byte[] UTF16LEGetBytes(final char[] value) {
+        return UTF16LE.encode(CharBuffer.wrap(value)).array();
+    }
+
+    private static char[] UTF16LEGetString(final byte[] bytes) {
+        return UTF16LE.decode(ByteBuffer.wrap(bytes)).array();
     }
 
     private static CredAdvapi32 getCredAdvapi32Instance() {

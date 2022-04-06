@@ -6,6 +6,8 @@ package com.microsoft.a4o.credentialstorage.storage.macosx;
 import com.microsoft.a4o.credentialstorage.storage.SecretStore;
 import com.microsoft.a4o.credentialstorage.secret.Credential;
 
+import java.util.Map;
+
 /**
  * Keychain store for a credential.
  */
@@ -13,13 +15,25 @@ public final class KeychainSecurityBackedCredentialStore extends KeychainSecurit
         implements SecretStore<Credential> {
 
     @Override
-    public Credential get(String key) {
-        return readCredentials(key);
+    public Credential get(final String key) {
+        final Map<String, Object> metaData = read(SecretKind.Credential, key);
+
+        final Credential result;
+        if (metaData.size() > 0) {
+            final String userName = (String) metaData.get(ACCOUNT_METADATA);
+            final String password = (String) metaData.get(PASSWORD);
+
+            result = new Credential(userName, password.toCharArray());
+        } else {
+            result = null;
+        }
+
+        return result;
     }
 
     @Override
-    public boolean add(String key, Credential secret) {
-        writeCredential(key, secret);
+    public boolean add(final String key, final Credential credentials) {
+        write(SecretKind.Credential, key, credentials.getUsername(), credentials.getPassword());
         return true;
     }
 
