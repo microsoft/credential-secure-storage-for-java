@@ -11,17 +11,12 @@ import com.microsoft.credentialstorage.storage.StorageProvider.SecureOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 public class AppToken {
-    private static final String TOKEN_KEY = "TestToken";
-    private static final BufferedReader INPUT = new BufferedReader(new InputStreamReader(System.in));
-
     private static final Logger log = LoggerFactory.getLogger(AppToken.class);
 
-    public static void main(final String[] args) throws IOException {
+    private static final String TOKEN_KEY = "TestToken";
+
+    public static void main(final String[] args) {
         // Get a secure store instance
         final SecretStore<Token> tokenStorage = StorageProvider.getTokenStorage(true, SecureOption.MUST);
 
@@ -38,9 +33,8 @@ public class AppToken {
         printToken(tokenName, storedToken);
 
         // Create a new token instance from user input
-        log.info("Enter token value: ");
-        final String tokenValue = INPUT.readLine();
-        final Token token = new Token(tokenValue, TokenType.Personal);
+        final char[] tokenValue = System.console().readPassword("Enter token value: ");
+        final Token token = new Token(tokenValue, TokenType.PERSONAL);
 
         // Save the token to the store
         tokenStorage.add(tokenName, token);
@@ -54,8 +48,7 @@ public class AppToken {
         printToken(tokenName, newStoredToken);
 
         // Remove token from the store
-        log.info("Remove the token under the key {} [Y/n]?", tokenName);
-        final String userInput = INPUT.readLine();
+        final String userInput = System.console().readLine("Remove the token under the key %s [Y/n]?", tokenName);
         if (!"n".equalsIgnoreCase(userInput)) {
             tokenStorage.delete(tokenName);
         }
@@ -70,9 +63,8 @@ public class AppToken {
         }
     }
 
-    private static String getTokenName() throws IOException {
-        log.info("Enter token name [{}]: ", TOKEN_KEY);
-        String tokenName = INPUT.readLine();
+    private static String getTokenName() {
+        String tokenName = System.console().readLine("Enter token name [%s]: ", TOKEN_KEY);
         if (tokenName == null || tokenName.isEmpty()) tokenName = TOKEN_KEY;
         return tokenName;
     }

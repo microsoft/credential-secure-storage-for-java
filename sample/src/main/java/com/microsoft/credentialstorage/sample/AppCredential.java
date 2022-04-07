@@ -10,17 +10,14 @@ import com.microsoft.credentialstorage.storage.StorageProvider.SecureOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.Arrays;
 
 public class AppCredential {
-    private static final String CREDENTIALS_KEY = "TestCredentials";
-    private static final BufferedReader INPUT = new BufferedReader(new InputStreamReader(System.in));
-
     private static final Logger log = LoggerFactory.getLogger(AppCredential.class);
 
-    public static void main(final String[] args) throws IOException {
+    private static final String CREDENTIALS_KEY = "TestCredentials";
+
+    public static void main(final String[] args) {
         // Get a secure store instance
         final SecretStore<Credential> credentialStorage = StorageProvider.getCredentialStorage(true, SecureOption.MUST);
 
@@ -37,11 +34,9 @@ public class AppCredential {
         printCredential(credentialName, storedCredential);
 
         // Create a new credential instance from user input
-        log.info("Enter user name:");
-        String userName = INPUT.readLine();
+        String userName = System.console().readLine("Enter user name: ");
 
-        log.info("Enter password:");
-        String password = INPUT.readLine();
+        char[] password = System.console().readPassword("Enter password: ");
 
         final Credential credential = new Credential(userName, password);
 
@@ -58,7 +53,7 @@ public class AppCredential {
 
         // Remove credentials from the store
         log.info("Remove the credentials under the key {} [Y/n]?", credentialName);
-        final String userInput = INPUT.readLine();
+        final String userInput = System.console().readLine();
         if (!"n".equalsIgnoreCase(userInput)) {
             credentialStorage.delete(credentialName);
         }
@@ -68,18 +63,18 @@ public class AppCredential {
         if (credential != null) {
             log.info("Retrieved the existing credentials using the key: {}", credentialName);
             log.info("  Username: {}", credential.getUsername());
-            log.info("  Password: {}", credential.getPassword());
+            log.info("  Password: {}", Arrays.toString(credential.getPassword()));
         } else {
             log.info("No stored credentials under the key: " + credentialName);
         }
     }
 
-    private static String getCredentialName() throws IOException {
-        log.info("Enter credentials name [{}]:", CREDENTIALS_KEY);
-        String credentialsName = INPUT.readLine();
+    private static String getCredentialName() {
+        String credentialsName = System.console().readLine("Enter credentials name [%s]:", CREDENTIALS_KEY);
         if (credentialsName == null || credentialsName.isEmpty()) {
             credentialsName = CREDENTIALS_KEY;
         }
         return credentialsName;
     }
 }
+

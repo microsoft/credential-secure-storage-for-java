@@ -10,24 +10,16 @@ import com.microsoft.credentialstorage.storage.StorageProvider.SecureOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class AppTokenPair {
-    private static final String TOKEN_PAIR_KEY = "TestTokenPair";
-    private static final BufferedReader INPUT = new BufferedReader(new InputStreamReader(System.in));
-
     private static final Logger log = LoggerFactory.getLogger(AppTokenPair.class);
 
-    public static void main(String[] args) throws IOException {
+    private static final String TOKEN_PAIR_KEY = "TestTokenPair";
+
+    public static void main(String[] args) {
         // Get a secure store instance
         final SecretStore<TokenPair> tokenPairStorage = StorageProvider.getTokenPairStorage(true, SecureOption.MUST);
-
-        if (tokenPairStorage == null) {
-            log.error("No secure token storage available.");
-            return;
-        }
 
         // Get token pair name from the user
         final String tokenPairName = getTokenPairName();
@@ -37,10 +29,8 @@ public class AppTokenPair {
         printTokenPair(tokenPairName, storedTokenPair);
 
         // Create a new token pair instance from user input
-        log.info("Enter access token value: ");
-        final String accessTokenValue = INPUT.readLine();
-        log.info("Enter refresh token value: ");
-        final String refreshTokenValue = INPUT.readLine();
+        final char[] accessTokenValue = System.console().readPassword("Enter access token value: ");
+        final char[] refreshTokenValue = System.console().readPassword("Enter refresh token value: ");
         TokenPair tokenPair = new TokenPair(accessTokenValue, refreshTokenValue);
 
         // Save the token pair to the store
@@ -56,7 +46,7 @@ public class AppTokenPair {
 
         // Remove token pair from the store
         log.info("Remove the token pair under the key {} [Y/n]?", tokenPairName);
-        final String userInput = INPUT.readLine();
+        final String userInput = System.console().readLine("Remove the token under the key %s [Y/n]?", tokenPair);
         if (!"n".equalsIgnoreCase(userInput)) {
             tokenPairStorage.delete(tokenPairName);
         }
@@ -72,9 +62,8 @@ public class AppTokenPair {
         }
     }
 
-    private static String getTokenPairName() throws IOException {
-        log.info("Enter token pair name [{}]: ", TOKEN_PAIR_KEY);
-        String tokenPairName = INPUT.readLine();
+    private static String getTokenPairName() {
+        String tokenPairName = System.console().readLine("Enter token pair name [%s]: ", TOKEN_PAIR_KEY);
         if (tokenPairName == null || tokenPairName.isEmpty()) tokenPairName = TOKEN_PAIR_KEY;
         return tokenPairName;
     }
