@@ -12,8 +12,6 @@ import java.util.Objects;
  * Credential Manager store for a token.
  */
 public final class CredManagerBackedTokenStore extends CredManagerBackedSecureStore<Token> {
-    static final String TOKEN_USERNAME = "PersonalAccessToken";
-
     @Override
     protected Token create(final String username, final char[] secret) {
         return new Token(secret, TokenType.PERSONAL);
@@ -26,6 +24,6 @@ public final class CredManagerBackedTokenStore extends CredManagerBackedSecureSt
 
         logger.info("Adding secret for {}", key);
 
-        return writeSecret(key, TOKEN_USERNAME, secret.getValue());
+        return writeSecret(key, secret.getType().getDescription(), secret.getValue());
     }
 }
