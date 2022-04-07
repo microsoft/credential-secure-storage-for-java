@@ -7,6 +7,6 @@ module credential.secure.storage {
     requires org.slf4j;
     requires com.sun.jna.platform;
 
-    exports com.microsoft.credentialstorage.secret;
-    exports com.microsoft.credentialstorage.storage;
+    exports com.microsoft.credentialstorage.model;
+    exports com.microsoft.credentialstorage;
 }

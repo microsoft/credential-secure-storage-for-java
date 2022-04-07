@@ -3,10 +3,10 @@
 
 package com.microsoft.credentialstorage.sample;
 
-import com.microsoft.credentialstorage.secret.Credential;
-import com.microsoft.credentialstorage.storage.SecretStore;
-import com.microsoft.credentialstorage.storage.StorageProvider;
-import com.microsoft.credentialstorage.storage.StorageProvider.SecureOption;
+import com.microsoft.credentialstorage.model.Credential;
+import com.microsoft.credentialstorage.SecretStore;
+import com.microsoft.credentialstorage.StorageProvider;
+import com.microsoft.credentialstorage.StorageProvider.SecureOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
