@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.implementation.posix.keyring;
 
-import com.microsoft.credentialstorage.model.Secret;
+import com.microsoft.credentialstorage.model.StoredSecret;
 import com.microsoft.credentialstorage.SecretStore;
 import com.microsoft.credentialstorage.implementation.posix.internal.GLibInitializer;
 import com.microsoft.credentialstorage.implementation.posix.internal.GnomeKeyringLibrary;
@@ -16,7 +16,7 @@ import java.util.Objects;
  * Base class for GNOME Keyring stores.
  * @param <E> secret class to store
  */
-public abstract class GnomeKeyringBackedSecureStore<E extends Secret> implements SecretStore<E> {
+public abstract class GnomeKeyringBackedSecureStore<E extends StoredSecret> implements SecretStore<E> {
     private static final Logger logger = LoggerFactory.getLogger(GnomeKeyringBackedSecureStore.class);
 
     protected static final GnomeKeyringLibrary INSTANCE = getGnomeKeyringLibrary();

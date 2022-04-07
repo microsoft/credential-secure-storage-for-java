@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.implementation.windows;
 
-import com.microsoft.credentialstorage.model.TokenPair;
+import com.microsoft.credentialstorage.model.StoredTokenPair;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,12 +29,12 @@ public class CredManagerBackedTokenPairStoreIT {
     public void saveTokenPair() {
         final String testKey = "http://thisisatestkey";
 
-        final TokenPair tokenPair = new TokenPair(sampleAccessToken.toCharArray(), sampleRefreshToken.toCharArray());
+        final StoredTokenPair tokenPair = new StoredTokenPair(sampleAccessToken.toCharArray(), sampleRefreshToken.toCharArray());
         boolean added = underTest.add(testKey, tokenPair);
 
         assertTrue(added);
 
-        final TokenPair readValue = underTest.get(testKey);
+        final StoredTokenPair readValue = underTest.get(testKey);
 
         assertNotNull("Token pair not found", readValue);
 
@@ -45,7 +45,7 @@ public class CredManagerBackedTokenPairStoreIT {
         boolean deleted = underTest.delete(testKey);
         assertTrue("Token pair not deleted", deleted);
 
-        final TokenPair nonExistent = underTest.get(testKey);
+        final StoredTokenPair nonExistent = underTest.get(testKey);
         assertNull(nonExistent);
     }
 }

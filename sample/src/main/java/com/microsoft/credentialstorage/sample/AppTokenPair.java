@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.sample;
 
-import com.microsoft.credentialstorage.model.TokenPair;
+import com.microsoft.credentialstorage.model.StoredTokenPair;
 import com.microsoft.credentialstorage.SecretStore;
 import com.microsoft.credentialstorage.StorageProvider;
 import com.microsoft.credentialstorage.StorageProvider.SecureOption;
@@ -17,19 +17,19 @@ public class AppTokenPair {
 
     public static void main(String[] args) {
         // Get a secure store instance
-        final SecretStore<TokenPair> tokenPairStorage = StorageProvider.getTokenPairStorage(true, SecureOption.MUST);
+        final SecretStore<StoredTokenPair> tokenPairStorage = StorageProvider.getTokenPairStorage(true, SecureOption.MUST);
 
         // Get token pair name from the user
         final String tokenPairName = getTokenPairName();
 
         // Retrieve the existing token pair from the store
-        final TokenPair storedTokenPair = tokenPairStorage.get(tokenPairName);
+        final StoredTokenPair storedTokenPair = tokenPairStorage.get(tokenPairName);
         printTokenPair(tokenPairName, storedTokenPair);
 
         // Create a new token pair instance from user input
         final char[] accessTokenValue = System.console().readPassword("Enter access token value: ");
         final char[] refreshTokenValue = System.console().readPassword("Enter refresh token value: ");
-        TokenPair tokenPair = new TokenPair(accessTokenValue, refreshTokenValue);
+        StoredTokenPair tokenPair = new StoredTokenPair(accessTokenValue, refreshTokenValue);
 
         // Save the token pair to the store
         tokenPairStorage.add(tokenPairName, tokenPair);
@@ -37,7 +37,7 @@ public class AppTokenPair {
         log.info("Added/Updated token pair under the key: {}", tokenPairName);
 
         // Retrieve new token pair from the store
-        TokenPair newStoredTokenPair = tokenPairStorage.get(tokenPairName);
+        StoredTokenPair newStoredTokenPair = tokenPairStorage.get(tokenPairName);
 
         log.info("Retrieved the updated token pair using the key: {}", tokenPairName);
         printTokenPair(tokenPairName, newStoredTokenPair);
@@ -50,7 +50,7 @@ public class AppTokenPair {
         }
     }
 
-    private static void printTokenPair(final String tokenPairName, final TokenPair tokenPair) {
+    private static void printTokenPair(final String tokenPairName, final StoredTokenPair tokenPair) {
         if (tokenPair != null) {
             log.info("Retrieved the existing token pair using the key: " + tokenPairName);
             log.info("  Access token: {} (Type: {})", tokenPair.getAccessToken().getValue(), tokenPair.getAccessToken().getType());

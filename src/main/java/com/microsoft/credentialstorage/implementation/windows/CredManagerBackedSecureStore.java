@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.implementation.windows;
 
-import com.microsoft.credentialstorage.model.Secret;
+import com.microsoft.credentialstorage.model.StoredSecret;
 import com.microsoft.credentialstorage.SecretStore;
 import com.sun.jna.LastErrorException;
 import com.sun.jna.Memory;
@@ -23,7 +23,7 @@ import java.util.function.Function;
 /**
  * This class exposes functions to interact with Windows Credential Manager
  */
-public abstract class CredManagerBackedSecureStore<E extends Secret> implements SecretStore<E> {
+public abstract class CredManagerBackedSecureStore<E extends StoredSecret> implements SecretStore<E> {
     protected static final Logger logger = LoggerFactory.getLogger(CredManagerBackedSecureStore.class);
     private static final Charset UTF16LE = StandardCharsets.UTF_16LE;
 

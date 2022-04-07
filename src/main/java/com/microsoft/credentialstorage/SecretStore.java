@@ -3,14 +3,14 @@
 
 package com.microsoft.credentialstorage;
 
-import com.microsoft.credentialstorage.model.Secret;
+import com.microsoft.credentialstorage.model.StoredSecret;
 
 /**
  * Secret store to hold the credentials.
  *
  * @param <E> a secret
  */
-public interface SecretStore<E extends Secret> {
+public interface SecretStore<E extends StoredSecret> {
 
     /**
      * Retrieve a secret identified by the key from this store.

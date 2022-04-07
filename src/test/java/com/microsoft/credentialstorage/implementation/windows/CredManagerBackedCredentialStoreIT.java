@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.implementation.windows;
 
-import com.microsoft.credentialstorage.model.Credential;
+import com.microsoft.credentialstorage.model.StoredCredential;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,14 +28,14 @@ public class CredManagerBackedCredentialStoreIT {
 
     @Test
     public void e2eTestStoreReadDelete() {
-        Credential credential= new Credential(username, password);
+        StoredCredential credential= new StoredCredential(username, password);
         final String key = "CredManagerTest:http://test.com:Credential";
 
         // this should have been saved to cred manager, it would be good if you can set a breakpoint
         // and manually verify this now
         underTest.add(key, credential);
 
-        Credential readCred = underTest.get(key);
+        StoredCredential readCred = underTest.get(key);
 
         assertEquals("Retrieved Credential.Username is different", username, credential.getUsername());
         assertEquals("Retrieved Credential.Password is different", password, credential.getPassword());

@@ -3,27 +3,27 @@
 
 package com.microsoft.credentialstorage.implementation.macosx;
 
-import com.microsoft.credentialstorage.model.TokenType;
+import com.microsoft.credentialstorage.model.StoredTokenType;
 import com.microsoft.credentialstorage.SecretStore;
-import com.microsoft.credentialstorage.model.Token;
+import com.microsoft.credentialstorage.model.StoredToken;
 
 import java.util.Map;
 
 /**
  * Keychain store for a token.
  */
-public final class KeychainSecurityBackedTokenStore extends KeychainSecurityCliStore implements SecretStore<Token> {
+public final class KeychainSecurityBackedTokenStore extends KeychainSecurityCliStore implements SecretStore<StoredToken> {
 
     @Override
-    public Token get(final String key) {
+    public StoredToken get(final String key) {
         final Map<String, Object> metaData = read(SecretKind.Token, key);
 
-        final Token result;
+        final StoredToken result;
         if (metaData.size() > 0) {
             final String typeName = (String) metaData.get(ACCOUNT_METADATA);
             final char[] password = (char[]) metaData.get(PASSWORD);
 
-            result = new Token(password, TokenType.valueOf(typeName));
+            result = new StoredToken(password, StoredTokenType.valueOf(typeName));
         } else {
             result = null;
         }
@@ -32,7 +32,7 @@ public final class KeychainSecurityBackedTokenStore extends KeychainSecurityCliS
     }
 
     @Override
-    public boolean add(final String key, final Token token) {
+    public boolean add(final String key, final StoredToken token) {
         writeTokenKind(key, SecretKind.Token, token);
         return true;
     }

@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.implementation.macosx;
 
-import com.microsoft.credentialstorage.model.Token;
+import com.microsoft.credentialstorage.model.StoredToken;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -330,7 +330,7 @@ public class KeychainSecurityCliStore {
         }
     }
 
-    protected void writeTokenKind(final String targetName, final SecretKind secretKind, final Token token) {
+    protected void writeTokenKind(final String targetName, final SecretKind secretKind, final StoredToken token) {
         final String accountName = token.getType().name();
         write(secretKind, targetName, accountName, token.getValue());
     }

@@ -9,8 +9,8 @@ import java.util.Objects;
 /**
  * A security token, usually acquired by some authentication and identity services.
  */
-public final class Token implements Secret {
-    private final TokenType type;
+public final class StoredToken implements StoredSecret {
+    private final StoredTokenType type;
     private final char[] value;
 
     /**
@@ -19,7 +19,7 @@ public final class Token implements Secret {
      * @param value token value
      * @param type token type
      */
-    public Token(final char[] value, final TokenType type) {
+    public StoredToken(final char[] value, final StoredTokenType type) {
         Objects.requireNonNull(value, "The value parameter is null");
         Objects.requireNonNull(type, "The type parameter is null");
 
@@ -31,7 +31,7 @@ public final class Token implements Secret {
      * The type of the security token.
      * @return token type
      */
-    public TokenType getType() {
+    public StoredTokenType getType() {
         return type;
     }
 
@@ -44,7 +44,7 @@ public final class Token implements Secret {
     }
 
     /**
-     * Compares an object to this {@link Token} for equality.
+     * Compares an object to this {@link StoredToken} for equality.
      *
      * @param o The object to compare.
      * @return True is equal; false otherwise.
@@ -53,7 +53,7 @@ public final class Token implements Secret {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Token token = (Token) o;
+        StoredToken token = (StoredToken) o;
         return type == token.type && Arrays.equals(value, token.value);
     }
 

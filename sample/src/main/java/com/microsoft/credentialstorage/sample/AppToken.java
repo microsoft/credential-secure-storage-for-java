@@ -3,8 +3,8 @@
 
 package com.microsoft.credentialstorage.sample;
 
-import com.microsoft.credentialstorage.model.Token;
-import com.microsoft.credentialstorage.model.TokenType;
+import com.microsoft.credentialstorage.model.StoredToken;
+import com.microsoft.credentialstorage.model.StoredTokenType;
 import com.microsoft.credentialstorage.SecretStore;
 import com.microsoft.credentialstorage.StorageProvider;
 import com.microsoft.credentialstorage.StorageProvider.SecureOption;
@@ -18,7 +18,7 @@ public class AppToken {
 
     public static void main(final String[] args) {
         // Get a secure store instance
-        final SecretStore<Token> tokenStorage = StorageProvider.getTokenStorage(true, SecureOption.MUST);
+        final SecretStore<StoredToken> tokenStorage = StorageProvider.getTokenStorage(true, SecureOption.MUST);
 
         if (tokenStorage == null) {
             log.error("No secure token storage available.");
@@ -29,12 +29,12 @@ public class AppToken {
         final String tokenName = getTokenName();
 
         // Retrieve the existing token from the store
-        final Token storedToken = tokenStorage.get(tokenName);
+        final StoredToken storedToken = tokenStorage.get(tokenName);
         printToken(tokenName, storedToken);
 
         // Create a new token instance from user input
         final char[] tokenValue = System.console().readPassword("Enter token value: ");
-        final Token token = new Token(tokenValue, TokenType.PERSONAL);
+        final StoredToken token = new StoredToken(tokenValue, StoredTokenType.PERSONAL);
 
         // Save the token to the store
         tokenStorage.add(tokenName, token);
@@ -42,7 +42,7 @@ public class AppToken {
         log.info("Added/Updated token under the key: {}", tokenName);
 
         // Retrieve new token from the store
-        Token newStoredToken = tokenStorage.get(tokenName);
+        StoredToken newStoredToken = tokenStorage.get(tokenName);
 
         log.info("Retrieved the updated token using the key: {}", tokenName);
         printToken(tokenName, newStoredToken);
@@ -54,7 +54,7 @@ public class AppToken {
         }
     }
 
-    private static void printToken(final String tokenName, final Token token) {
+    private static void printToken(final String tokenName, final StoredToken token) {
         if (token != null) {
             log.info("Retrieved the existing token using the key: {}", tokenName);
             log.info("  Token: {} (Type: {})", token.getValue(), token.getType());

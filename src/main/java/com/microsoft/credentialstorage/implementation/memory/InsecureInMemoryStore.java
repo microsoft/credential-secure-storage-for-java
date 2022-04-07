@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.implementation.memory;
 
-import com.microsoft.credentialstorage.model.Secret;
+import com.microsoft.credentialstorage.model.StoredSecret;
 import com.microsoft.credentialstorage.SecretStore;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @param <E> secret type to store
  */
-public final class InsecureInMemoryStore<E extends Secret> implements SecretStore<E> {
+public final class InsecureInMemoryStore<E extends StoredSecret> implements SecretStore<E> {
 
     private final ConcurrentMap<String, E> store = new ConcurrentHashMap<>();
 

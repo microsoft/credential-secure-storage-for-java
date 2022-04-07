@@ -4,7 +4,7 @@
 package com.microsoft.credentialstorage.implementation.macosx;
 
 import com.microsoft.credentialstorage.SecretStore;
-import com.microsoft.credentialstorage.model.Credential;
+import com.microsoft.credentialstorage.model.StoredCredential;
 
 import java.util.Map;
 
@@ -12,18 +12,18 @@ import java.util.Map;
  * Keychain store for a credential.
  */
 public final class KeychainSecurityBackedCredentialStore extends KeychainSecurityCliStore
-        implements SecretStore<Credential> {
+        implements SecretStore<StoredCredential> {
 
     @Override
-    public Credential get(final String key) {
+    public StoredCredential get(final String key) {
         final Map<String, Object> metaData = read(SecretKind.Credential, key);
 
-        final Credential result;
+        final StoredCredential result;
         if (metaData.size() > 0) {
             final String userName = (String) metaData.get(ACCOUNT_METADATA);
             final String password = (String) metaData.get(PASSWORD);
 
-            result = new Credential(userName, password.toCharArray());
+            result = new StoredCredential(userName, password.toCharArray());
         } else {
             result = null;
         }
@@ -32,7 +32,7 @@ public final class KeychainSecurityBackedCredentialStore extends KeychainSecurit
     }
 
     @Override
-    public boolean add(final String key, final Credential credentials) {
+    public boolean add(final String key, final StoredCredential credentials) {
         write(SecretKind.Credential, key, credentials.getUsername(), credentials.getPassword());
         return true;
     }

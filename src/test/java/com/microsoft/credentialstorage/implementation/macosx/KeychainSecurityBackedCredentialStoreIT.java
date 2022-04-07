@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.implementation.macosx;
 
-import com.microsoft.credentialstorage.model.Credential;
+import com.microsoft.credentialstorage.model.StoredCredential;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,14 +26,14 @@ public class KeychainSecurityBackedCredentialStoreIT {
 
     @Test
     public void e2eTestStoreReadDelete() {
-        Credential credential= new Credential(username, password);
+        StoredCredential credential= new StoredCredential(username, password);
         final String key = "KeychainTest:http://test.com:Credential";
 
         // this should have been saved to cred manager, it would be good if you can set a breakpoint
         // and manually verify this now
         underTest.add(key, credential);
 
-        final Credential readCred = underTest.get(key);
+        final StoredCredential readCred = underTest.get(key);
 
         assertEquals("Retrieved Credential.Username is different", username, credential.getUsername());
         assertEquals("Retrieved Credential.Password is different", password, credential.getPassword());
@@ -41,7 +41,7 @@ public class KeychainSecurityBackedCredentialStoreIT {
         // The credential under the specified key should be deleted now
         underTest.delete(key);
 
-        final Credential nonExistent = underTest.get(key);
+        final StoredCredential nonExistent = underTest.get(key);
         assertNull(nonExistent);
     }
 }

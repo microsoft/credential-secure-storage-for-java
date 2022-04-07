@@ -4,17 +4,17 @@
 package com.microsoft.credentialstorage.implementation.macosx;
 
 import com.microsoft.credentialstorage.SecretStore;
-import com.microsoft.credentialstorage.model.TokenPair;
+import com.microsoft.credentialstorage.model.StoredTokenPair;
 
 import java.util.Map;
 
 /**
  * Keychain store for a token pair.
  */
-public final class KeychainSecurityBackedTokenPairStore extends KeychainSecurityCliStore implements SecretStore<TokenPair> {
+public final class KeychainSecurityBackedTokenPairStore extends KeychainSecurityCliStore implements SecretStore<StoredTokenPair> {
 
     @Override
-    public TokenPair get(final String key) {
+    public StoredTokenPair get(final String key) {
         char[] accessToken, refreshToken;
 
         final Map<String, Object> accessTokenMetaData = read(SecretKind.TokenPair_Access_Token, key);
@@ -34,14 +34,14 @@ public final class KeychainSecurityBackedTokenPairStore extends KeychainSecurity
         }
 
         if (accessToken != null && refreshToken != null) {
-            return new TokenPair(accessToken, refreshToken);
+            return new StoredTokenPair(accessToken, refreshToken);
         }
 
         return null;
     }
 
     @Override
-    public boolean add(final String key, final TokenPair tokenPair) {
+    public boolean add(final String key, final StoredTokenPair tokenPair) {
         if (tokenPair.getAccessToken().getValue() != null) {
             writeTokenKind(key, SecretKind.TokenPair_Access_Token, tokenPair.getAccessToken());
         }

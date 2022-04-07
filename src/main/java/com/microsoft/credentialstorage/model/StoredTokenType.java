@@ -6,7 +6,7 @@ package com.microsoft.credentialstorage.model;
 /**
  * Represents a type of security token.
  */
-public enum TokenType {
+public enum StoredTokenType {
     /**
      * Unknown type.
      */
@@ -34,7 +34,7 @@ public enum TokenType {
 
     private final String description;
 
-    TokenType(final String description) {
+    StoredTokenType(final String description) {
         this.description = description;
     }
 

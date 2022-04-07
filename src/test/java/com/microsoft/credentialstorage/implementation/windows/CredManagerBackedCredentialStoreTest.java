@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.implementation.windows;
 
-import com.microsoft.credentialstorage.model.Credential;
+import com.microsoft.credentialstorage.model.StoredCredential;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ public class CredManagerBackedCredentialStoreTest {
     //low value basic tests that should auto run
     @Test
     public void testCreate() {
-        Credential credential = underTest.create(username, password);
+        StoredCredential credential = underTest.create(username, password);
 
         assertEquals("Username not correct", username, credential.getUsername());
         assertArrayEquals("Password not correct", password, credential.getPassword());

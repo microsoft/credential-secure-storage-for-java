@@ -6,5 +6,5 @@ package com.microsoft.credentialstorage.model;
 /**
  * An interface representing a secret.
  */
-public interface Secret {
+public interface StoredSecret {
 }

@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.implementation.windows;
 
-import com.microsoft.credentialstorage.model.Token;
+import com.microsoft.credentialstorage.model.StoredToken;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ public class CredManagerBackedTokenStoreTest {
     public void testCreate() {
         char[] secretValue = "my secret".toCharArray();
 
-        Token token = underTest.create("do not care", secretValue);
+        StoredToken token = underTest.create("do not care", secretValue);
 
         assertArrayEquals("Secret not correct", secretValue, token.getValue());
     }

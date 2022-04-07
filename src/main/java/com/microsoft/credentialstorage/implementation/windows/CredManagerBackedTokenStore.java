@@ -3,22 +3,22 @@
 
 package com.microsoft.credentialstorage.implementation.windows;
 
-import com.microsoft.credentialstorage.model.Token;
-import com.microsoft.credentialstorage.model.TokenType;
+import com.microsoft.credentialstorage.model.StoredToken;
+import com.microsoft.credentialstorage.model.StoredTokenType;
 
 import java.util.Objects;
 
 /**
  * Credential Manager store for a token.
  */
-public final class CredManagerBackedTokenStore extends CredManagerBackedSecureStore<Token> {
+public final class CredManagerBackedTokenStore extends CredManagerBackedSecureStore<StoredToken> {
     @Override
-    protected Token create(final String username, final char[] secret) {
-        return new Token(secret, TokenType.PERSONAL);
+    protected StoredToken create(final String username, final char[] secret) {
+        return new StoredToken(secret, StoredTokenType.PERSONAL);
     }
 
     @Override
-    public boolean add(final String key, final Token secret) {
+    public boolean add(final String key, final StoredToken secret) {
         Objects.requireNonNull(key, "key cannot be null");
         Objects.requireNonNull(secret, "secret cannot be null");
 

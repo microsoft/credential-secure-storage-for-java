@@ -4,7 +4,7 @@
 package com.microsoft.credentialstorage.implementation.posix.keyring;
 
 import com.microsoft.credentialstorage.implementation.posix.internal.GnomeKeyringLibrary;
-import com.microsoft.credentialstorage.model.TokenPair;
+import com.microsoft.credentialstorage.model.StoredTokenPair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +13,7 @@ import java.util.Objects;
 /**
  * GNOME Keyring store for a token pair.
  */
-public final class GnomeKeyringBackedTokenPairStore extends GnomeKeyringBackedSecureStore<TokenPair> {
+public final class GnomeKeyringBackedTokenPairStore extends GnomeKeyringBackedSecureStore<StoredTokenPair> {
     private static final Logger logger = LoggerFactory.getLogger(GnomeKeyringBackedTokenPairStore.class);
     public static final String ACCESS_TOKEN = "/accessToken";
     public static final String REFRESH_TOKEN = "/refreshToken";
@@ -25,7 +25,7 @@ public final class GnomeKeyringBackedTokenPairStore extends GnomeKeyringBackedSe
      * @return secret
      */
     @Override
-    public TokenPair get(final String key) {
+    public StoredTokenPair get(final String key) {
         Objects.requireNonNull(key, "key cannot be null");
 
         logger.info("Getting {} for {}", getType(), key);
@@ -38,11 +38,11 @@ public final class GnomeKeyringBackedTokenPairStore extends GnomeKeyringBackedSe
             return null;
         }
 
-        return new TokenPair(secretAccess, secretRefresh);
+        return new StoredTokenPair(secretAccess, secretRefresh);
     }
 
     @Override
-    public boolean add(final String key, TokenPair secret) {
+    public boolean add(final String key, StoredTokenPair secret) {
         Objects.requireNonNull(key, "key cannot be null");
         Objects.requireNonNull(secret, "Secret cannot be null");
 

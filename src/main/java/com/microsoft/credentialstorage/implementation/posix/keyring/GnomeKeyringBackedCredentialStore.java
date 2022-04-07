@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.implementation.posix.keyring;
 
-import com.microsoft.credentialstorage.model.Credential;
+import com.microsoft.credentialstorage.model.StoredCredential;
 import com.microsoft.credentialstorage.implementation.posix.internal.GnomeKeyringLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import java.util.Objects;
 /**
  * GNOME Keyring store for a credential.
  */
-public final class GnomeKeyringBackedCredentialStore extends GnomeKeyringBackedSecureStore<Credential> {
+public final class GnomeKeyringBackedCredentialStore extends GnomeKeyringBackedSecureStore<StoredCredential> {
     private static final Logger logger = LoggerFactory.getLogger(GnomeKeyringBackedCredentialStore.class);
 
     /**
@@ -23,7 +23,7 @@ public final class GnomeKeyringBackedCredentialStore extends GnomeKeyringBackedS
      * @return secret
      */
     @Override
-    public Credential get(final String key) {
+    public StoredCredential get(final String key) {
         Objects.requireNonNull(key, "key cannot be null");
 
         logger.info("Getting {} for {}", getType(), key);
@@ -46,11 +46,11 @@ public final class GnomeKeyringBackedCredentialStore extends GnomeKeyringBackedS
             }
         }
 
-        return secret != null ? new Credential(key, secret) : null;
+        return secret != null ? new StoredCredential(key, secret) : null;
     }
 
     @Override
-    public boolean add(final String key, Credential secret) {
+    public boolean add(final String key, StoredCredential secret) {
         Objects.requireNonNull(key, "key cannot be null");
         Objects.requireNonNull(secret, "Secret cannot be null");
 

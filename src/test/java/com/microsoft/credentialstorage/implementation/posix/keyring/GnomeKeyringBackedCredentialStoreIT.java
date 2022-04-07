@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.implementation.posix.keyring;
 
-import com.microsoft.credentialstorage.model.Credential;
+import com.microsoft.credentialstorage.model.StoredCredential;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,12 +28,12 @@ public class GnomeKeyringBackedCredentialStoreIT {
     public void saveCredential() {
         final String testKey = "http://thisisatestkey";
 
-        final Credential credential = new Credential("username", "pass:\"word".toCharArray());
+        final StoredCredential credential = new StoredCredential("username", "pass:\"word".toCharArray());
         boolean added = underTest.add(testKey, credential);
 
         assertTrue(added);
 
-        final Credential readValue = underTest.get(testKey);
+        final StoredCredential readValue = underTest.get(testKey);
 
         assertEquals(credential.getUsername(), readValue.getUsername());
         assertEquals(credential.getPassword(), readValue.getPassword());
@@ -41,7 +41,7 @@ public class GnomeKeyringBackedCredentialStoreIT {
         boolean deleted = underTest.delete(testKey);
         assertTrue(deleted);
 
-        final Credential nonExistent = underTest.get(testKey);
+        final StoredCredential nonExistent = underTest.get(testKey);
         assertNull(nonExistent);
     }
 }

@@ -3,8 +3,8 @@
 
 package com.microsoft.credentialstorage.implementation.posix.keyring;
 
-import com.microsoft.credentialstorage.model.Token;
-import com.microsoft.credentialstorage.model.TokenType;
+import com.microsoft.credentialstorage.model.StoredToken;
+import com.microsoft.credentialstorage.model.StoredTokenType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,12 +30,12 @@ public class GnomeKeyringBackedTokenStoreIT {
     public void saveToken() {
         final String testKey = "http://thisisatestkey";
 
-        final Token token = new Token("bi4295xkwev6djxej7hpffuoo4rzcqcogakubpu2sd7kopuoquaq".toCharArray(), TokenType.PERSONAL);
+        final StoredToken token = new StoredToken("bi4295xkwev6djxej7hpffuoo4rzcqcogakubpu2sd7kopuoquaq".toCharArray(), StoredTokenType.PERSONAL);
         boolean added = underTest.add(testKey, token);
 
         assertTrue(added);
 
-        final Token readValue = underTest.get(testKey);
+        final StoredToken readValue = underTest.get(testKey);
 
         assertNotNull(readValue);
         assertArrayEquals(token.getValue(), readValue.getValue());
@@ -43,7 +43,7 @@ public class GnomeKeyringBackedTokenStoreIT {
         boolean deleted = underTest.delete(testKey);
         assertTrue(deleted);
 
-        final Token nonExistent = underTest.get(testKey);
+        final StoredToken nonExistent = underTest.get(testKey);
         assertNull(nonExistent);
     }
 }

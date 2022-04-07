@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.implementation.posix.keyring;
 
-import com.microsoft.credentialstorage.model.TokenPair;
+import com.microsoft.credentialstorage.model.StoredTokenPair;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -55,12 +55,12 @@ public class GnomeKeyringBackedTokenPairStoreIT {
     public void saveTokenPair() {
         final String testKey = "http://thisisatestkey";
 
-        final TokenPair tokenPair = new TokenPair(SAMPLE_ACCESS_TOKEN.toCharArray(), SAMPLE_REFRESH_TOKEN.toCharArray());
+        final StoredTokenPair tokenPair = new StoredTokenPair(SAMPLE_ACCESS_TOKEN.toCharArray(), SAMPLE_REFRESH_TOKEN.toCharArray());
         boolean added = underTest.add(testKey, tokenPair);
 
         assertTrue(added);
 
-        final TokenPair readValue = underTest.get(testKey);
+        final StoredTokenPair readValue = underTest.get(testKey);
 
         assertNotNull(readValue);
         assertEquals(tokenPair.getAccessToken(), readValue.getAccessToken());
@@ -69,7 +69,7 @@ public class GnomeKeyringBackedTokenPairStoreIT {
         boolean deleted = underTest.delete(testKey);
         assertTrue(deleted);
 
-        final TokenPair nonExistent = underTest.get(testKey);
+        final StoredTokenPair nonExistent = underTest.get(testKey);
         assertNull(nonExistent);
     }
 }

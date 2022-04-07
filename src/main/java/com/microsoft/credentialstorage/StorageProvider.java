@@ -3,10 +3,10 @@
 
 package com.microsoft.credentialstorage;
 
-import com.microsoft.credentialstorage.model.Credential;
-import com.microsoft.credentialstorage.model.Secret;
-import com.microsoft.credentialstorage.model.Token;
-import com.microsoft.credentialstorage.model.TokenPair;
+import com.microsoft.credentialstorage.model.StoredCredential;
+import com.microsoft.credentialstorage.model.StoredSecret;
+import com.microsoft.credentialstorage.model.StoredToken;
+import com.microsoft.credentialstorage.model.StoredTokenPair;
 import com.microsoft.credentialstorage.implementation.macosx.KeychainSecurityBackedCredentialStore;
 import com.microsoft.credentialstorage.implementation.macosx.KeychainSecurityBackedTokenPairStore;
 import com.microsoft.credentialstorage.implementation.macosx.KeychainSecurityBackedTokenStore;
@@ -52,19 +52,19 @@ public final class StorageProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(StorageProvider.class);
 
-    private static final List<SecretStore<Token>> PERSISTED_TOKEN_STORE_CANDIDATES;
+    private static final List<SecretStore<StoredToken>> PERSISTED_TOKEN_STORE_CANDIDATES;
 
-    private static final List<SecretStore<TokenPair>> PERSISTED_TOKENPAIR_STORE_CANDIDATES;
+    private static final List<SecretStore<StoredTokenPair>> PERSISTED_TOKENPAIR_STORE_CANDIDATES;
 
-    private static final List<SecretStore<Credential>> PERSISTED_CREDENTIAL_STORE_CANDIDATES;
+    private static final List<SecretStore<StoredCredential>> PERSISTED_CREDENTIAL_STORE_CANDIDATES;
 
     private StorageProvider() {
     }
 
     static {
-        List<SecretStore<Token>> tokenStoreCandidates = new ArrayList<>();
-        List<SecretStore<TokenPair>> tokenPairStoreCandidates = new ArrayList<>();
-        List<SecretStore<Credential>> credentialStoreCandidates = new ArrayList<>();
+        List<SecretStore<StoredToken>> tokenStoreCandidates = new ArrayList<>();
+        List<SecretStore<StoredTokenPair>> tokenPairStoreCandidates = new ArrayList<>();
+        List<SecretStore<StoredCredential>> credentialStoreCandidates = new ArrayList<>();
 
         if (CredManagerBackedSecureStore.isSupported()) {
             tokenStoreCandidates.add(new CredManagerBackedTokenStore());
@@ -96,20 +96,20 @@ public final class StorageProvider {
      * @param secureOption secure or non-secure storage
      * @return store
      */
-    public static SecretStore<Token> getTokenStorage(final boolean persist, final SecureOption secureOption) {
+    public static SecretStore<StoredToken> getTokenStorage(final boolean persist, final SecureOption secureOption) {
         Objects.requireNonNull(secureOption, "secureOption cannot be null");
 
         logger.info("Getting a {} token store that {} be secure", persist ? "persistent" : "non-persistent",
                 secureOption == SecureOption.MUST ? "must" : "could");
 
-        final NonPersistentStoreGenerator<Token> inMemoryStoreGenerator = new NonPersistentStoreGenerator<>() {
+        final NonPersistentStoreGenerator<StoredToken> inMemoryStoreGenerator = new NonPersistentStoreGenerator<>() {
             @Override
-            public SecretStore<Token> getInsecureNonPersistentStore() {
+            public SecretStore<StoredToken> getInsecureNonPersistentStore() {
                 return new InsecureInMemoryStore<>();
             }
 
             @Override
-            public SecretStore<Token> getSecureNonPersistentStore() {
+            public SecretStore<StoredToken> getSecureNonPersistentStore() {
                 logger.warn("Do not have any secure non-persistent stores available.");
                 return null;
             }
@@ -125,20 +125,20 @@ public final class StorageProvider {
      * @param secureOption secure or non-secure storage
      * @return store
      */
-    public static SecretStore<TokenPair> getTokenPairStorage(final boolean persist, final SecureOption secureOption) {
+    public static SecretStore<StoredTokenPair> getTokenPairStorage(final boolean persist, final SecureOption secureOption) {
         Objects.requireNonNull(secureOption, "secureOption cannot be null");
 
         logger.info("Getting a {} tokenPair store that {} be secure", persist ? "persistent" : "non-persistent",
                 secureOption == SecureOption.MUST ? "must" : "could");
 
-        final NonPersistentStoreGenerator<TokenPair> inMemoryStoreGenerator = new NonPersistentStoreGenerator<>() {
+        final NonPersistentStoreGenerator<StoredTokenPair> inMemoryStoreGenerator = new NonPersistentStoreGenerator<>() {
             @Override
-            public SecretStore<TokenPair> getInsecureNonPersistentStore() {
+            public SecretStore<StoredTokenPair> getInsecureNonPersistentStore() {
                 return new InsecureInMemoryStore<>();
             }
 
             @Override
-            public SecretStore<TokenPair> getSecureNonPersistentStore() {
+            public SecretStore<StoredTokenPair> getSecureNonPersistentStore() {
                 logger.warn("Do not have any secure non-persistent stores available.");
                 return null;
             }
@@ -154,20 +154,20 @@ public final class StorageProvider {
      * @param secureOption secure or non-secure storage
      * @return store
      */
-    public static SecretStore<Credential> getCredentialStorage(final boolean persist, final SecureOption secureOption) {
+    public static SecretStore<StoredCredential> getCredentialStorage(final boolean persist, final SecureOption secureOption) {
         Objects.requireNonNull(secureOption, "secureOption cannot be null");
 
         logger.info("Getting a {} credential store that {} be secure", persist ? "persistent" : "non-persistent",
                 secureOption == SecureOption.MUST ? "must" : "could");
 
-        final NonPersistentStoreGenerator<Credential> inMemoryStoreGenerator = new NonPersistentStoreGenerator<>() {
+        final NonPersistentStoreGenerator<StoredCredential> inMemoryStoreGenerator = new NonPersistentStoreGenerator<>() {
             @Override
-            public SecretStore<Credential> getInsecureNonPersistentStore() {
+            public SecretStore<StoredCredential> getInsecureNonPersistentStore() {
                 return new InsecureInMemoryStore<>();
             }
 
             @Override
-            public SecretStore<Credential> getSecureNonPersistentStore() {
+            public SecretStore<StoredCredential> getSecureNonPersistentStore() {
                 logger.warn("Do not have any secure non-persistent stores available.");
                 return null;
             }
@@ -176,7 +176,7 @@ public final class StorageProvider {
         return getStore(persist, secureOption, PERSISTED_CREDENTIAL_STORE_CANDIDATES, inMemoryStoreGenerator);
     }
 
-    private static <E extends Secret> SecretStore<E> findSecureStore(final List<SecretStore<E>> stores) {
+    private static <E extends StoredSecret> SecretStore<E> findSecureStore(final List<SecretStore<E>> stores) {
         for (final SecretStore<E> store : stores) {
             if (store.isSecure()) {
                 return store;
@@ -186,8 +186,8 @@ public final class StorageProvider {
         return null;
     }
 
-    private static <E extends Secret> SecretStore<E> findPersistedStore(final SecureOption secureOption,
-                                                                 final List<SecretStore<E>> stores) {
+    private static <E extends StoredSecret> SecretStore<E> findPersistedStore(final SecureOption secureOption,
+                                                                              final List<SecretStore<E>> stores) {
         SecretStore<E> candidate = findSecureStore(stores);
 
         if (candidate == null && secureOption == SecureOption.PREFER) {
@@ -201,10 +201,10 @@ public final class StorageProvider {
         return candidate;
     }
 
-    static <E extends Secret> SecretStore<E> getStore(final boolean persist,
-                                                      final SecureOption secureOption,
-                                                      final List<SecretStore<E>> stores,
-                                                      final NonPersistentStoreGenerator<E> nonPersistentStoreGenerator) {
+    static <E extends StoredSecret> SecretStore<E> getStore(final boolean persist,
+                                                            final SecureOption secureOption,
+                                                            final List<SecretStore<E>> stores,
+                                                            final NonPersistentStoreGenerator<E> nonPersistentStoreGenerator) {
         Objects.requireNonNull(nonPersistentStoreGenerator, "nonPersistentStoreGenerator cannot be null.");
         Objects.requireNonNull(stores, "stores cannot be null.");
 
@@ -222,7 +222,7 @@ public final class StorageProvider {
         return candidate;
     }
 
-    interface NonPersistentStoreGenerator<E extends Secret> {
+    interface NonPersistentStoreGenerator<E extends StoredSecret> {
         SecretStore<E> getInsecureNonPersistentStore();
         SecretStore<E> getSecureNonPersistentStore();
     }

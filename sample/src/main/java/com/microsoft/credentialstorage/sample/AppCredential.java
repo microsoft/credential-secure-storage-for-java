@@ -3,7 +3,7 @@
 
 package com.microsoft.credentialstorage.sample;
 
-import com.microsoft.credentialstorage.model.Credential;
+import com.microsoft.credentialstorage.model.StoredCredential;
 import com.microsoft.credentialstorage.SecretStore;
 import com.microsoft.credentialstorage.StorageProvider;
 import com.microsoft.credentialstorage.StorageProvider.SecureOption;
@@ -19,7 +19,7 @@ public class AppCredential {
 
     public static void main(final String[] args) {
         // Get a secure store instance
-        final SecretStore<Credential> credentialStorage = StorageProvider.getCredentialStorage(true, SecureOption.MUST);
+        final SecretStore<StoredCredential> credentialStorage = StorageProvider.getCredentialStorage(true, SecureOption.MUST);
 
         if (credentialStorage == null) {
             log.error("No secure credential storage available.");
@@ -30,7 +30,7 @@ public class AppCredential {
         final String credentialName = getCredentialName();
 
         // Retrieve the existing credential from the store
-        final Credential storedCredential = credentialStorage.get(credentialName);
+        final StoredCredential storedCredential = credentialStorage.get(credentialName);
         printCredential(credentialName, storedCredential);
 
         // Create a new credential instance from user input
@@ -38,7 +38,7 @@ public class AppCredential {
 
         char[] password = System.console().readPassword("Enter password: ");
 
-        final Credential credential = new Credential(userName, password);
+        final StoredCredential credential = new StoredCredential(userName, password);
 
         // Save the credential to the store
         credentialStorage.add(credentialName, credential);
@@ -46,7 +46,7 @@ public class AppCredential {
         log.info("Added/Updated credentials under the key: {}", credentialName);
 
         // Retrieve the credential from the store
-        Credential newStoredCredential = credentialStorage.get(credentialName);
+        StoredCredential newStoredCredential = credentialStorage.get(credentialName);
 
         log.info("Retrieved the updated credentials using the key: {}", credentialName);
         printCredential(credentialName, newStoredCredential);
@@ -59,7 +59,7 @@ public class AppCredential {
         }
     }
 
-    private static void printCredential(final String credentialName, final Credential credential) {
+    private static void printCredential(final String credentialName, final StoredCredential credential) {
         if (credential != null) {
             log.info("Retrieved the existing credentials using the key: {}", credentialName);
             log.info("  Username: {}", credential.getUsername());

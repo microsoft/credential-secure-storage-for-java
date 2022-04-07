@@ -3,40 +3,40 @@
 
 package com.microsoft.credentialstorage.implementation.windows;
 
-import com.microsoft.credentialstorage.model.Token;
-import com.microsoft.credentialstorage.model.TokenPair;
-import com.microsoft.credentialstorage.model.TokenType;
+import com.microsoft.credentialstorage.model.StoredToken;
+import com.microsoft.credentialstorage.model.StoredTokenPair;
+import com.microsoft.credentialstorage.model.StoredTokenType;
 
 import java.util.Objects;
 
 /**
  * Credential Manager store for a token pair.
  */
-public final class CredManagerBackedTokenPairStore extends CredManagerBackedSecureStore<TokenPair> {
+public final class CredManagerBackedTokenPairStore extends CredManagerBackedSecureStore<StoredTokenPair> {
     private static final String ACCESS_TOKEN = "/accessToken";
     private static final String REFRESH_TOKEN = "/refreshToken";
 
     @Override
-    public TokenPair get(final String key) {
+    public StoredTokenPair get(final String key) {
         Objects.requireNonNull(key, "key cannot be null");
 
         logger.info("Getting secret for {}", key);
 
-        final Token accessToken = readSecret(key + ACCESS_TOKEN,
-                credential -> new Token(getSecret(credential), TokenType.ACCESS));
-        final Token refreshToken = readSecret(key + REFRESH_TOKEN,
-                credential -> new Token(getSecret(credential), TokenType.REFRESH));
+        final StoredToken accessToken = readSecret(key + ACCESS_TOKEN,
+                credential -> new StoredToken(getSecret(credential), StoredTokenType.ACCESS));
+        final StoredToken refreshToken = readSecret(key + REFRESH_TOKEN,
+                credential -> new StoredToken(getSecret(credential), StoredTokenType.REFRESH));
 
         // no token found
         if (accessToken == null && refreshToken == null) {
             return null;
         }
 
-        return new TokenPair(accessToken, refreshToken);
+        return new StoredTokenPair(accessToken, refreshToken);
     }
 
     @Override
-    public boolean add(final String key, final TokenPair secret) {
+    public boolean add(final String key, final StoredTokenPair secret) {
         Objects.requireNonNull(key, "key cannot be null");
         Objects.requireNonNull(secret, "secret cannot be null");
 
@@ -58,7 +58,7 @@ public final class CredManagerBackedTokenPairStore extends CredManagerBackedSecu
     }
 
     @Override
-    protected TokenPair create(final String username, final char[] secret) {
+    protected StoredTokenPair create(final String username, final char[] secret) {
         // not used
         return null;
     }

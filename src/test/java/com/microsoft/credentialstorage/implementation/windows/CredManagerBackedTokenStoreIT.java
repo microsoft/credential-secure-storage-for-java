@@ -3,8 +3,8 @@
 
 package com.microsoft.credentialstorage.implementation.windows;
 
-import com.microsoft.credentialstorage.model.Token;
-import com.microsoft.credentialstorage.model.TokenType;
+import com.microsoft.credentialstorage.model.StoredToken;
+import com.microsoft.credentialstorage.model.StoredTokenType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,14 +28,14 @@ public class CredManagerBackedTokenStoreIT {
 
     @Test
     public void e2eTestStoreReadDelete() {
-        final Token token = new Token("do not care".toCharArray(), TokenType.PERSONAL);
+        final StoredToken token = new StoredToken("do not care".toCharArray(), StoredTokenType.PERSONAL);
         final String key = "CredManagerTest:http://test.com:Token";
 
         // this should have been saved to cred manager, it would be good if you can set a breakpoint
         // and manually verify this now
         underTest.add(key, token);
 
-        Token readToken = underTest.get(key);
+        StoredToken readToken = underTest.get(key);
 
         assertNotNull("Token not found", readToken);
         assertArrayEquals("Retrieved token is different", token.getValue(), readToken.getValue());
