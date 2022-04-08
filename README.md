@@ -19,14 +19,14 @@ Maven is the preferred way to referencing this library.
 
 ```xml
   <dependency>
-    <groupId>com.microsoft.a4o</groupId>
+    <groupId>com.microsoft</groupId>
     <artifactId>credential-secure-storage</artifactId>
     <version>1.0.0</version>
   </dependency>
 ```
 
-Here is sample code for [credentials](sample/src/main/java/com/microsoft/a4o/credentialstorage/sample/AppCredential.java) 
-and [tokens](sample/src/main/java/com/microsoft/a4o/credentialstorage/sample/AppToken.java) that shows how to use this library.
+Here is sample code for [credentials](sample/src/main/java/com/microsoft/credentialstorage/sample/AppCredential.java) 
+and [tokens](sample/src/main/java/com/microsoft/credentialstorage/sample/AppToken.java) that shows how to use this library.
 
 
 # How to build
