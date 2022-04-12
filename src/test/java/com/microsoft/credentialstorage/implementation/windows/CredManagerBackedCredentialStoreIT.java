@@ -7,6 +7,7 @@ import com.microsoft.credentialstorage.model.StoredCredential;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -37,8 +38,8 @@ public class CredManagerBackedCredentialStoreIT {
 
         StoredCredential readCred = underTest.get(key);
 
-        assertEquals("Retrieved Credential.Username is different", username, credential.getUsername());
-        assertEquals("Retrieved Credential.Password is different", password, credential.getPassword());
+        assertEquals("Retrieved Credential.Username is different", username, readCred.getUsername());
+        assertArrayEquals("Retrieved Credential.Password is different", password, readCred.getPassword());
 
         // The credential under the specified key should be deleted now, it's a good idea to manually verify this now
         boolean deleted = underTest.delete(key);

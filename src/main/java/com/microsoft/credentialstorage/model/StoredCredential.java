@@ -3,7 +3,6 @@
 
 package com.microsoft.credentialstorage.model;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -14,7 +13,7 @@ public final class StoredCredential implements StoredSecret {
     private static final int PASSWORD_MAX_LENGTH = 2047;
 
     private final String username;
-    private final char[] password;
+    private final ClearableValue password;
 
     /**
      * Creates a credential object with a username and password pair.
@@ -35,7 +34,7 @@ public final class StoredCredential implements StoredSecret {
             throw new IllegalArgumentException(String.format("The password parameter cannot " +
                     "be longer than %1$d characters.", PASSWORD_MAX_LENGTH));
         }
-        this.password = password;
+        this.password = new ClearableValue(password);
     }
 
     /**
@@ -51,7 +50,15 @@ public final class StoredCredential implements StoredSecret {
      * @return secret
      */
     public char[] getPassword() {
-        return password;
+        return password.getValue();
+    }
+
+    /**
+     * Clear the secret value.
+     */
+    @Override
+    public void clear() {
+        password.clear();
     }
 
     /**
@@ -64,8 +71,9 @@ public final class StoredCredential implements StoredSecret {
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StoredCredential that = (StoredCredential) o;
-        return username.equals(that.username) && Arrays.equals(password, that.password);
+
+        final StoredCredential that = (StoredCredential) o;
+        return username.equals(that.username) && password.equals(that.password);
     }
 
     /**
@@ -75,6 +83,6 @@ public final class StoredCredential implements StoredSecret {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(username, Arrays.hashCode(password));
+        return Objects.hash(username, password);
     }
 }

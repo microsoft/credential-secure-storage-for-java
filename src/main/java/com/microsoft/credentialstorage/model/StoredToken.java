@@ -3,7 +3,6 @@
 
 package com.microsoft.credentialstorage.model;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -11,7 +10,7 @@ import java.util.Objects;
  */
 public final class StoredToken implements StoredSecret {
     private final StoredTokenType type;
-    private final char[] value;
+    private final ClearableValue value;
 
     /**
      * Creates a token object with a value and the specified type for a target identity.
@@ -24,7 +23,7 @@ public final class StoredToken implements StoredSecret {
         Objects.requireNonNull(type, "The type parameter is null");
 
         this.type = type;
-        this.value = value;
+        this.value = new ClearableValue(value);
     }
 
     /**
@@ -40,7 +39,15 @@ public final class StoredToken implements StoredSecret {
      * @return token value
      */
     public char[] getValue() {
-        return value;
+        return value.getValue();
+    }
+
+    /**
+     * Clear the token value.
+     */
+    @Override
+    public void clear() {
+        value.clear();
     }
 
     /**
@@ -53,8 +60,9 @@ public final class StoredToken implements StoredSecret {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StoredToken token = (StoredToken) o;
-        return type == token.type && Arrays.equals(value, token.value);
+
+        final StoredToken token = (StoredToken) o;
+        return type == token.type && value.equals(token.value);
     }
 
     /**
@@ -64,6 +72,6 @@ public final class StoredToken implements StoredSecret {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(type, Arrays.hashCode(value));
+        return Objects.hash(type, value);
     }
 }

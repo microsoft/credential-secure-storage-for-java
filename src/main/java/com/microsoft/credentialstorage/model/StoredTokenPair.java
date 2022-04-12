@@ -71,6 +71,15 @@ public final class StoredTokenPair implements StoredSecret {
     }
 
     /**
+     * Clear the token pair value.
+     */
+    @Override
+    public void clear() {
+        accessToken.clear();
+        refreshToken.clear();
+    }
+
+    /**
      * Compares an object to this.
      *
      * @param o The object to compare.
@@ -80,7 +89,8 @@ public final class StoredTokenPair implements StoredSecret {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StoredTokenPair tokenPair = (StoredTokenPair) o;
+
+        final StoredTokenPair tokenPair = (StoredTokenPair) o;
         return accessToken.equals(tokenPair.accessToken)
                 && refreshToken.equals(tokenPair.refreshToken);
     }

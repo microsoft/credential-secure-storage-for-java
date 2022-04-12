@@ -17,64 +17,90 @@ public class AppCredential {
 
     private static final String CREDENTIALS_KEY = "TestCredentials";
 
+    private SecretStore<StoredCredential> credentialStorage;
+
     public static void main(final String[] args) {
-        // Get a secure store instance
-        final SecretStore<StoredCredential> credentialStorage = StorageProvider.getCredentialStorage(true, SecureOption.MUST);
+        final AppCredential app = new AppCredential();
+
+        app.run();
+    }
+
+    private void run() {
+        // Get a secure store instance.
+        credentialStorage = StorageProvider.getCredentialStorage(true, SecureOption.MUST);
 
         if (credentialStorage == null) {
             log.error("No secure credential storage available.");
             return;
         }
 
-        // Get credentials name from the user
-        final String credentialName = getCredentialName();
+        registerUser();
 
-        // Retrieve the existing credential from the store
-        final StoredCredential storedCredential = credentialStorage.get(credentialName);
-        printCredential(credentialName, storedCredential);
+        userLogin();
 
-        // Create a new credential instance from user input
-        String userName = System.console().readLine("Enter user name: ");
+        unregisterUser();
+    }
 
-        char[] password = System.console().readPassword("Enter password: ");
+    private void registerUser() {
+        log.info("Registering a new user:");
+
+        final StoredCredential credential = enterCredentials();
+
+        try {
+            // Save the credential to the store.
+            credentialStorage.add(CREDENTIALS_KEY, credential);
+            log.info("User registered.");
+        } finally {
+            // clear password value.
+            credential.clear();
+        }
+    }
+
+    private void userLogin() {
+        log.info("Authenticating a user");
+
+        final StoredCredential enteredCredential = enterCredentials();
+        StoredCredential storedCredential = null;
+
+        try {
+            // Save the credential to the store.
+            storedCredential = credentialStorage.get(CREDENTIALS_KEY);
+
+            if (storedCredential.equals(enteredCredential)) {
+                log.info("User logged in successfully.");
+            } else {
+                log.info("Authentication failed.");
+            }
+        } finally {
+            // clear password value
+            enteredCredential.clear();
+
+            if (storedCredential != null) {
+                storedCredential.clear();
+            }
+        }
+    }
+
+    private void unregisterUser() {
+        // Remove credentials from the store.
+        credentialStorage.delete(CREDENTIALS_KEY);
+        log.info("User deleted.");
+    }
+
+    private StoredCredential enterCredentials() {
+        // Request user name from user.
+        final String userName = System.console().readLine("Enter user name: ");
+
+        // Request password from user.
+        // Using API which returns char[] to avoid creating String
+        // to minimize memory footprint for secure purposes.
+        final char[] password = System.console().readPassword("Enter password: ");
 
         final StoredCredential credential = new StoredCredential(userName, password);
 
-        // Save the credential to the store
-        credentialStorage.add(credentialName, credential);
+        // Password value is not needed anymore, clear it now without waiting GC to remove it.
+        Arrays.fill(password, (char) 0x00);
 
-        log.info("Added/Updated credentials under the key: {}", credentialName);
-
-        // Retrieve the credential from the store
-        StoredCredential newStoredCredential = credentialStorage.get(credentialName);
-
-        log.info("Retrieved the updated credentials using the key: {}", credentialName);
-        printCredential(credentialName, newStoredCredential);
-
-        // Remove credentials from the store
-        log.info("Remove the credentials under the key {} [Y/n]?", credentialName);
-        final String userInput = System.console().readLine();
-        if (!"n".equalsIgnoreCase(userInput)) {
-            credentialStorage.delete(credentialName);
-        }
-    }
-
-    private static void printCredential(final String credentialName, final StoredCredential credential) {
-        if (credential != null) {
-            log.info("Retrieved the existing credentials using the key: {}", credentialName);
-            log.info("  Username: {}", credential.getUsername());
-            log.info("  Password: {}", Arrays.toString(credential.getPassword()));
-        } else {
-            log.info("No stored credentials under the key: " + credentialName);
-        }
-    }
-
-    private static String getCredentialName() {
-        String credentialsName = System.console().readLine("Enter credentials name [%s]:", CREDENTIALS_KEY);
-        if (credentialsName == null || credentialsName.isEmpty()) {
-            credentialsName = CREDENTIALS_KEY;
-        }
-        return credentialsName;
+        return credential;
     }
 }
-
