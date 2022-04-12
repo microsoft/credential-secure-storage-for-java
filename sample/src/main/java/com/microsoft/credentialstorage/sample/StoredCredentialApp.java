@@ -12,15 +12,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
-public class AppCredential {
-    private static final Logger log = LoggerFactory.getLogger(AppCredential.class);
+public class StoredCredentialApp {
+    private static final Logger log = LoggerFactory.getLogger(StoredCredentialApp.class);
 
     private static final String CREDENTIALS_KEY = "TestCredentials";
 
     private SecretStore<StoredCredential> credentialStorage;
 
     public static void main(final String[] args) {
-        final AppCredential app = new AppCredential();
+        final StoredCredentialApp app = new StoredCredentialApp();
 
         app.run();
     }

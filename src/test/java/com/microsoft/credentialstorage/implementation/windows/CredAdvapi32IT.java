@@ -11,7 +11,7 @@ import com.sun.jna.ptr.IntByReference;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -26,15 +26,13 @@ public class CredAdvapi32IT {
         assumeTrue(CredManagerBackedSecureStore.isSupported());
     }
 
-    public static final String UTF8 = "UTF-8";
-
     // Attributes of the credential object for asserting
     private static final String KEY = "java-auth-test:https://test.com:token";
     private static final String PAT = "Personal Access Token";
     private static final String COMMENT = "Testing CredAdvapi32 instance";
 
     @Test
-    public void e2eTest() throws UnsupportedEncodingException {
+    public void e2eTest() {
         CredAdvapi32 instance = CredAdvapi32.INSTANCE;
 
         // make sure we can coexist with Advapi32 Instance since we load the same dll
@@ -67,7 +65,7 @@ public class CredAdvapi32IT {
         assertEquals("Username not correct", username, readCredential.UserName);
         // First way to read a string
         byte[] passwordInBytes = readCredential.CredentialBlob.getByteArray(0, readCredential.CredentialBlobSize);
-        assertEquals("Credential not correct", password, new String(passwordInBytes, UTF8));
+        assertEquals("Credential not correct", password, new String(passwordInBytes, StandardCharsets.UTF_8));
 
         // Another way to read string (without charset info, so I prefer the first method)
         assertEquals("Attribute Type not correct", PAT, readCredential.Attributes.Value.getString(0));
@@ -99,7 +97,6 @@ public class CredAdvapi32IT {
 
     private String callAdvapi32ForUsername() {
         Advapi32 advapi32 = Advapi32.INSTANCE;
-        CredAdvapi32 instance = CredAdvapi32.INSTANCE;
 
         IntByReference plen = new IntByReference();
         char[] buffer = new char[1024];
@@ -113,7 +110,7 @@ public class CredAdvapi32IT {
         );
     }
 
-    private CredAdvapi32.CREDENTIAL buildCred(String key, String username, String password) throws UnsupportedEncodingException {
+    private CredAdvapi32.CREDENTIAL buildCred(String key, String username, String password) {
         CredAdvapi32.CREDENTIAL credential = new CredAdvapi32.CREDENTIAL();
 
         // Populate credential struct
@@ -122,7 +119,7 @@ public class CredAdvapi32IT {
         credential.TargetName = key;
         credential.Comment = COMMENT;
 
-        byte[] pass = password.getBytes(UTF8);
+        byte[] pass = password.getBytes(StandardCharsets.UTF_8);
 
         credential.CredentialBlobSize = pass.length;
         credential.CredentialBlob = getPointer(pass);
@@ -142,13 +139,13 @@ public class CredAdvapi32IT {
         return p;
     }
 
-    private void setAttribute(CredAdvapi32.CREDENTIAL credential) throws UnsupportedEncodingException {
+    private void setAttribute(CredAdvapi32.CREDENTIAL credential) {
         credential.AttributeCount = 1;
 
         CredAdvapi32.CREDENTIAL_ATTRIBUTE.ByReference attrByRef = new CredAdvapi32.CREDENTIAL_ATTRIBUTE.ByReference();
         attrByRef.Flags = 0;
         attrByRef.Keyword = "Credential Type";
-        byte[] value = PAT.getBytes(UTF8);
+        byte[] value = PAT.getBytes(StandardCharsets.UTF_8);
         attrByRef.ValueSize = value.length;
         attrByRef.Value = getPointer(value);
 

@@ -26,7 +26,7 @@ public class KeychainSecurityBackedCredentialStoreIT {
 
     @Test
     public void e2eTestStoreReadDelete() {
-        StoredCredential credential= new StoredCredential(username, password);
+        StoredCredential credential = new StoredCredential(username, password);
         final String key = "KeychainTest:http://test.com:Credential";
 
         // this should have been saved to cred manager, it would be good if you can set a breakpoint
@@ -35,8 +35,8 @@ public class KeychainSecurityBackedCredentialStoreIT {
 
         final StoredCredential readCred = underTest.get(key);
 
-        assertEquals("Retrieved Credential.Username is different", username, credential.getUsername());
-        assertEquals("Retrieved Credential.Password is different", password, credential.getPassword());
+        assertEquals("Retrieved Credential.Username is different", username, readCred.getUsername());
+        assertEquals("Retrieved Credential.Password is different", password, readCred.getPassword());
 
         // The credential under the specified key should be deleted now
         underTest.delete(key);

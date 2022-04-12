@@ -15,7 +15,8 @@ import static org.junit.Assert.assertTrue;
 
 public class StorageProviderTest {
 
-    private StorageProvider.NonPersistentStoreGenerator<StoredToken> generator = new StorageProvider.NonPersistentStoreGenerator<StoredToken>() {
+    private final StorageProvider.NonPersistentStoreGenerator<StoredToken> generator =
+            new StorageProvider.NonPersistentStoreGenerator<>() {
         @Override
         public SecretStore<StoredToken> getInsecureNonPersistentStore() {
             return getStore(false);
@@ -28,8 +29,8 @@ public class StorageProviderTest {
     };
 
     @Test
-    public void withAvailableSecureStore_shouldReturnSecureStore() throws Exception {
-        List<SecretStore<StoredToken>> candidates = new ArrayList<SecretStore<StoredToken>>();
+    public void withAvailableSecureStore_shouldReturnSecureStore() {
+        List<SecretStore<StoredToken>> candidates = new ArrayList<>();
         //Add one persisted secure store to it
         candidates.add(getStore(true));
 
@@ -38,16 +39,16 @@ public class StorageProviderTest {
     }
 
     @Test
-    public void noAvailableSecureStore_shouldReturnNull() throws Exception {
-        List<SecretStore<StoredToken>> candidates = new ArrayList<SecretStore<StoredToken>>();
+    public void noAvailableSecureStore_shouldReturnNull() {
+        List<SecretStore<StoredToken>> candidates = new ArrayList<>();
 
         final SecretStore<StoredToken> actual = StorageProvider.getStore(true, StorageProvider.SecureOption.MUST, candidates, generator);
         assertNull(actual);
     }
 
     @Test
-    public void nonPersisted_MustBeSecure_shouldUseGenerator() throws Exception {
-        List<SecretStore<StoredToken>> candidates = new ArrayList<SecretStore<StoredToken>>();
+    public void nonPersisted_MustBeSecure_shouldUseGenerator() {
+        List<SecretStore<StoredToken>> candidates = new ArrayList<>();
         //Add one persisted secure store to it
         candidates.add(getStore(true));
 
@@ -56,8 +57,8 @@ public class StorageProviderTest {
     }
 
     @Test
-    public void nonPersisted_doNotCareSecurity_shouldUseGenerator() throws Exception {
-        List<SecretStore<StoredToken>> candidates = new ArrayList<SecretStore<StoredToken>>();
+    public void nonPersisted_doNotCareSecurity_shouldUseGenerator() {
+        List<SecretStore<StoredToken>> candidates = new ArrayList<>();
         //Add one persisted secure store to it
         candidates.add(getStore(true));
 
@@ -66,7 +67,7 @@ public class StorageProviderTest {
     }
 
     private SecretStore<StoredToken> getStore(final boolean secure) {
-        return new SecretStore<StoredToken>() {
+        return new SecretStore<>() {
             @Override
             public StoredToken get(String key) { return null; }
 
@@ -82,5 +83,4 @@ public class StorageProviderTest {
             }
         };
     }
-
 }

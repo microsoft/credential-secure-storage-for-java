@@ -7,7 +7,7 @@ import com.microsoft.credentialstorage.model.StoredTokenPair;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assume.assumeTrue;
 
@@ -36,8 +36,8 @@ public class KeychainSecurityBackedTokenPairStoreIT {
 
         final StoredTokenPair readToken = underTest.get(key);
 
-        assertEquals("Retrieved Access Token is different", sampleAccessToken, readToken.getAccessToken().getValue());
-        assertEquals("Retrieved Refresh Token is different", sampleRefreshToken, readToken.getRefreshToken().getValue());
+        assertArrayEquals("Retrieved Access Token is different", sampleAccessToken, readToken.getAccessToken().getValue());
+        assertArrayEquals("Retrieved Refresh Token is different", sampleRefreshToken, readToken.getRefreshToken().getValue());
 
         // The credential under the specified key should be deleted now
         underTest.delete(key);
