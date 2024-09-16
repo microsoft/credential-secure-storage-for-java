@@ -74,7 +74,7 @@ SOFTWARE
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <slf4j.version>1.7.36</slf4j.version>
-    <jna.version>5.9.0</jna.version>
+    <jna.version>5.15.0</jna.version>
     <junit.version>4.13.2</junit.version>
   </properties>
 
