@@ -6,7 +6,7 @@ Licensed under the MIT license. See License.txt in the project root. -->
 
     <groupId>com.microsoft</groupId>
     <artifactId>credential-secure-storage-sample</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.3</version>
     <packaging>jar</packaging>
 
     <name>Sample Application for the Credential Secure Storage library</name>
@@ -28,7 +28,7 @@ Licensed under the MIT license. See License.txt in the project root. -->
         <dependency>
             <groupId>com.microsoft</groupId>
             <artifactId>credential-secure-storage</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.3</version>
         </dependency>
 
         <dependency>
