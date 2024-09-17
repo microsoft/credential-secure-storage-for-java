@@ -26,7 +26,7 @@ public class KeychainSecurityCliStore {
     private static final String ACCOUNT_PARAMETER = "-a";
     private static final String SERVICE_PARAMETER = "-s";
     private static final String KIND_PARAMETER = "-D";
-    private static final String PASSWORD_PARAMETER = "-w";
+    private static final String PASSWORD_PARAMETER = "-X";
     private static final String UPDATE_IF_ALREADY_EXISTS = "-U";
     private static final int ITEM_NOT_FOUND_EXIT_CODE = 44;
     private static final int USER_INTERACTION_NOT_ALLOWED_EXIT_CODE = 36;
@@ -310,7 +310,7 @@ public class KeychainSecurityCliStore {
                 UPDATE_IF_ALREADY_EXISTS,
                 ACCOUNT_PARAMETER, accountName,
                 SERVICE_PARAMETER, serviceName,
-                PASSWORD_PARAMETER, password,
+                PASSWORD_PARAMETER, getHexString(password),
                 KIND_PARAMETER, secretKind.name()
             };
             final Process process = addProcessBuilder.start();
@@ -388,5 +388,16 @@ public class KeychainSecurityCliStore {
                     + Character.digit(hexString.charAt(i+1), 16));
         }
         return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    private static String getHexString(char[] input) {
+        StringBuilder hexString = new StringBuilder();
+
+        byte[] bytes = new String(input).getBytes(StandardCharsets.UTF_8);
+        for (byte b : bytes) {
+            hexString.append(Integer.toHexString(b & 0xFF));
+        }
+
+        return hexString.toString();
     }
 }

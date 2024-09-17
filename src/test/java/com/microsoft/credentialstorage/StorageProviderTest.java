@@ -3,7 +3,6 @@
 
 package com.microsoft.credentialstorage;
 
-import com.microsoft.credentialstorage.model.StoredCredential;
 import com.microsoft.credentialstorage.model.StoredToken;
 import org.junit.Test;
 
@@ -63,21 +62,6 @@ public class StorageProviderTest {
 
         final SecretStore<StoredToken> actual = StorageProvider.getStore(false, StorageProvider.SecureOption.PREFERRED, candidates, generator);
         assertFalse(actual.isSecure());
-    }
-
-    @Test
-    public void persisted_shouldStoreNonAscii() {
-        final String key = "NotExisting";
-
-        final SecretStore<StoredCredential> credentialStorage = StorageProvider.getCredentialStorage(true, StorageProvider.SecureOption.PREFERRED);
-        assertTrue(credentialStorage.isSecure());
-
-        StoredCredential credentialsToStore = new StoredCredential("TästUser", "TästPassword".toCharArray());
-        credentialStorage.add(key, credentialsToStore);
-
-        StoredCredential stored = credentialStorage.get(key);
-        assertEquals("TästUser", stored.getUsername());
-        assertEquals("TästPassword", new String(stored.getPassword()));
     }
 
     private SecretStore<StoredToken> getStore(final boolean secure) {

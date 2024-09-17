@@ -85,4 +85,19 @@ public class KeychainSecurityBackedCredentialStoreIT {
         final StoredCredential nonExistent = underTest.get(key);
         assertNull("Credential can still be read from store", nonExistent);
     }
+
+    @Test
+    public void get_shouldHandleNonAsciiValues() {
+        final String key = "KeychainTest:http://test.com:Credential";
+
+        StoredCredential credential = new StoredCredential("TästUser", "\"TästPassword\"!@#$%^&*()-_=+{}[]:;\"'<>,.?/\\~`".toCharArray());
+        boolean success = underTest.add(key, credential);
+        assertTrue("Storing credential failed", success);
+
+        final StoredCredential readCred = underTest.get(key);
+
+        assertNotNull("Credential not found", readCred);
+        assertEquals("Retrieved Credential.Username is different", "TästUser", readCred.getUsername());
+        assertArrayEquals("Retrieved Credential.Password is different", "\"TästPassword\"!@#$%^&*()-_=+{}[]:;\"'<>,.?/\\~`".toCharArray(), readCred.getPassword());
+    }
 }

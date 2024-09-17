@@ -7,11 +7,7 @@ import com.microsoft.credentialstorage.model.StoredTokenPair;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
 public class KeychainSecurityBackedTokenPairStoreIT {
@@ -50,5 +46,20 @@ public class KeychainSecurityBackedTokenPairStoreIT {
 
         StoredTokenPair nonExistent = underTest.get(key);
         assertNull("Token can still be read from store", nonExistent);
+    }
+
+    @Test
+    public void get_shouldHandleNonAsciiValues() {
+        final String key = "KeychainTest:http://test.com:TokenPair";
+
+        StoredTokenPair tokenPair = new StoredTokenPair("TästAccess".toCharArray(), "\"TästRefresh\"!@#$%^&*()-_=+{}[]:;\"'<>,.?/\\~`".toCharArray());
+        boolean success = underTest.add(key, tokenPair);
+        assertTrue("Storing token pair failed", success);
+
+        final StoredTokenPair readTokenPair = underTest.get(key);
+
+        assertNotNull("Token pair not found", readTokenPair);
+        assertArrayEquals("Retrieved TokenPair.AccessToken is different", "TästAccess".toCharArray(), readTokenPair.getAccessToken().getValue());
+        assertArrayEquals("Retrieved TokenPair.RefreshToken is different", "\"TästRefresh\"!@#$%^&*()-_=+{}[]:;\"'<>,.?/\\~`".toCharArray(), readTokenPair.getRefreshToken().getValue());
     }
 }
