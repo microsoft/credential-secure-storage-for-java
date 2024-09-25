@@ -37,7 +37,7 @@ public class KeychainSecurityCliStore {
     private static final Pattern MetadataLinePattern = Pattern.compile
             (
                     //   ^(\w+):\s"(.+)"
-                    "^(\\w+):\\s\"(.+)\""
+                    "^(\\w+):\\s(?:\"(.+)\"|)"
             );
 
     enum SecretKind {
@@ -116,7 +116,7 @@ public class KeychainSecurityCliStore {
         if (matcher.matches()) {
             final String key = matcher.group(1);
             final String value = matcher.group(2);
-            destination.put(key, value);
+            destination.put(key, value != null ? value : "");
         }
     }
 
@@ -247,7 +247,7 @@ public class KeychainSecurityCliStore {
             }
         }
         if (isNullValue) {
-            destination.put(key.toString(), null);
+            destination.put(key.toString(), "");
         } else if ("blob".equals(type.toString())) {
             final int lastCharIndex = value.length() - 1;
             value.deleteCharAt(lastCharIndex);

@@ -48,4 +48,18 @@ public class CredManagerBackedTokenStoreIT {
         final StoredToken nonExistent = underTest.get(key);
         assertNull("Token can still be read from store", nonExistent);
     }
+
+    @Test
+    public void shouldAddEmptyToken() {
+        final String key = "CredManagerTest:http://test.com:Token";
+
+        StoredToken token = new StoredToken("".toCharArray(), StoredTokenType.PERSONAL);
+        boolean success = underTest.add(key, token);
+        assertTrue("Storing token failed", success);
+
+        final StoredToken readToken = underTest.get(key);
+
+        assertNotNull("Token not found", readToken);
+        assertArrayEquals("Retrieved Access Token is different", "".toCharArray(), readToken.getValue());
+    }
 }

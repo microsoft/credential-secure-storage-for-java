@@ -45,4 +45,19 @@ public class LibSecretBackedCredentialStoreIT {
         final StoredCredential nonExistent = underTest.get(key);
         assertNull("Credential can still be read from store", nonExistent);
     }
+
+    @Test
+    public void shouldAddEmptyPassword() {
+        final String key = "http://thisisatestkey";
+
+        StoredCredential credential = new StoredCredential("username", "".toCharArray());
+        boolean success = underTest.add(key, credential);
+        assertTrue("Storing credential failed", success);
+
+        final StoredCredential readCred = underTest.get(key);
+
+        assertNotNull("Credential not found", readCred);
+        assertEquals("Retrieved Credential.Username is different", "username", readCred.getUsername());
+        assertArrayEquals("Retrieved Credential.Password is different", "".toCharArray(), readCred.getPassword());
+    }
 }

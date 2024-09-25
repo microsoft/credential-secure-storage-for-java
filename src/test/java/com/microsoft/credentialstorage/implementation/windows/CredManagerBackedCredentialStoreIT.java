@@ -52,4 +52,34 @@ public class CredManagerBackedCredentialStoreIT {
         final StoredCredential nonExistent = underTest.get(key);
         assertNull("Credential can still be read from store", nonExistent);
     }
+
+    @Test
+    public void shouldAddEmptyUsername() {
+        final String key = "KeychainTest:http://test.com:Credential";
+
+        StoredCredential credential = new StoredCredential("", "password".toCharArray());
+        boolean success = underTest.add(key, credential);
+        assertTrue("Storing credential failed", success);
+
+        final StoredCredential readCred = underTest.get(key);
+
+        assertNotNull("Credential not found", readCred);
+        assertEquals("Retrieved Credential.Username is different", "", readCred.getUsername());
+        assertArrayEquals("Retrieved Credential.Password is different", "password".toCharArray(), readCred.getPassword());
+    }
+
+    @Test
+    public void shouldAddEmptyPassword() {
+        final String key = "KeychainTest:http://test.com:Credential";
+
+        StoredCredential credential = new StoredCredential("username", "".toCharArray());
+        boolean success = underTest.add(key, credential);
+        assertTrue("Storing credential failed", success);
+
+        final StoredCredential readCred = underTest.get(key);
+
+        assertNotNull("Credential not found", readCred);
+        assertEquals("Retrieved Credential.Username is different", "username", readCred.getUsername());
+        assertArrayEquals("Retrieved Credential.Password is different", "".toCharArray(), readCred.getPassword());
+    }
 }
