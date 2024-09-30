@@ -77,4 +77,18 @@ public class KeychainSecurityBackedTokenStoreIT {
         StoredToken nonExistentToken = underTest.get(key);
         assertNull(nonExistentToken);
     }
+
+    @Test
+    public void get_shouldHandleNonAsciiAndSpecialValues() {
+        final String key = "KeychainTest:http://test.com:Token";
+
+        StoredToken tokenPair = new StoredToken("\"TästAccess\"!@#$%^&*()-_=+{}[]:;\"'<>,.?/\\~`".toCharArray(), StoredTokenType.ACCESS);
+        boolean success = underTest.add(key, tokenPair);
+        assertTrue("Storing token pair failed", success);
+
+        final StoredToken readToken = underTest.get(key);
+
+        assertNotNull("Token not found", readToken);
+        assertArrayEquals("Retrieved Token is different", "\"TästAccess\"!@#$%^&*()-_=+{}[]:;\"'<>,.?/\\~`".toCharArray(), readToken.getValue());
+    }
 }

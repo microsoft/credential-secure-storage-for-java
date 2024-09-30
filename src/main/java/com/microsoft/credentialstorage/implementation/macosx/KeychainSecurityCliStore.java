@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -25,7 +26,7 @@ public class KeychainSecurityCliStore {
     private static final String ACCOUNT_PARAMETER = "-a";
     private static final String SERVICE_PARAMETER = "-s";
     private static final String KIND_PARAMETER = "-D";
-    private static final String PASSWORD_PARAMETER = "-w";
+    private static final String PASSWORD_PARAMETER = "-X";
     private static final String UPDATE_IF_ALREADY_EXISTS = "-U";
     private static final int ITEM_NOT_FOUND_EXIT_CODE = 44;
     private static final int USER_INTERACTION_NOT_ALLOWED_EXIT_CODE = 36;
@@ -37,17 +38,17 @@ public class KeychainSecurityCliStore {
     private static final Pattern MetadataLinePattern = Pattern.compile
             (
                     //   ^(\w+):\s"(.+)"
-                    "^(\\w+):\\s\"(.+)\""
+                    "^(\\w+):\\s((?:0x[0-9A-Fa-f]*\\s+)?\"(.+)\")"
             );
 
-    enum SecretKind {
+    protected enum SecretKind {
         Credential,
         Token,
         TokenPair_Access_Token,
         TokenPair_Refresh_Token
     }
 
-    enum AttributeParsingState {
+    protected enum AttributeParsingState {
         Spaces,
         StringKey,
         HexKey,
@@ -115,7 +116,7 @@ public class KeychainSecurityCliStore {
         final Matcher matcher = MetadataLinePattern.matcher(line);
         if (matcher.matches()) {
             final String key = matcher.group(1);
-            final String value = matcher.group(2);
+            final String value = getAttributeValue(matcher.group(2));
             destination.put(key, value);
         }
     }
@@ -248,10 +249,8 @@ public class KeychainSecurityCliStore {
         }
         if (isNullValue) {
             destination.put(key.toString(), null);
-        } else if ("blob".equals(type.toString())) {
-            final int lastCharIndex = value.length() - 1;
-            value.deleteCharAt(lastCharIndex);
-            destination.put(key.toString(), value.toString());
+        } else if ("blob".contentEquals(type)) {
+            destination.put(key.toString(), getAttributeValue(value.toString()));
         }
         // TODO: else if ("timedate".equals(type))
         // TODO: else if ("uint32".equals(type))
@@ -311,7 +310,7 @@ public class KeychainSecurityCliStore {
                 UPDATE_IF_ALREADY_EXISTS,
                 ACCOUNT_PARAMETER, accountName,
                 SERVICE_PARAMETER, serviceName,
-                PASSWORD_PARAMETER, password,
+                PASSWORD_PARAMETER, getHexString(password),
                 KIND_PARAMETER, secretKind.name()
             };
             final Process process = addProcessBuilder.start();
@@ -348,7 +347,7 @@ public class KeychainSecurityCliStore {
             String line;
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
-                sb.append(System.getProperty("line.separator"));
+                sb.append(System.lineSeparator());
             }
             return sb.toString();
         }
@@ -367,5 +366,38 @@ public class KeychainSecurityCliStore {
             }
             writer.print('"');
         }
+    }
+
+    private static String getAttributeValue(String value) {
+        // if string has non-ascii character hex value is prepended, convert it to UTF string
+        if (value.matches("0x[0-9A-Fa-f]+\\s+\".*")) {
+            String hexString = value.split("0x")[1].split(" ")[0];
+            return hexStringToString(hexString);
+        }
+
+        int start = value.startsWith("\"") ? 1 : 0;
+        int end = value.endsWith("\"") ? value.length() - 1 : value.length();
+
+        return value.substring(start, end);
+    }
+
+    private static String hexStringToString(String hexString) {
+        byte[] bytes = new byte[hexString.length() / 2];
+        for (int i = 0; i < hexString.length(); i += 2) {
+            bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                    + Character.digit(hexString.charAt(i+1), 16));
+        }
+        return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    private static String getHexString(char[] input) {
+        StringBuilder hexString = new StringBuilder();
+
+        byte[] bytes = new String(input).getBytes(StandardCharsets.UTF_8);
+        for (byte b : bytes) {
+            hexString.append(Integer.toHexString(b & 0xFF));
+        }
+
+        return hexString.toString();
     }
 }
