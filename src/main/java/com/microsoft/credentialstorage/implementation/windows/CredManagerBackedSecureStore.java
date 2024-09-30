@@ -108,12 +108,15 @@ public abstract class CredManagerBackedSecureStore<E extends StoredSecret> imple
     protected abstract E create(String username, char[] secret);
 
     private E createSecret(final CredAdvapi32.CREDENTIAL credential) {
+        final String userName = credential.UserName != null ? credential.UserName : "";
         final char[] secret = getSecret(credential);
-        return create(credential.UserName, secret);
+        return create(userName, secret);
     }
 
     protected char[] getSecret(final CredAdvapi32.CREDENTIAL credential) {
-        final byte[] secretData = credential.CredentialBlob.getByteArray(0, credential.CredentialBlobSize);
+        final byte[] secretData = credential.CredentialBlobSize > 0
+                ? credential.CredentialBlob.getByteArray(0, credential.CredentialBlobSize)
+                : new byte[0];
         return UTF16LEGetString(secretData);
     }
 
@@ -133,7 +136,6 @@ public abstract class CredManagerBackedSecureStore<E extends StoredSecret> imple
                 final CredAdvapi32.CREDENTIAL credential = new CredAdvapi32.CREDENTIAL(pcredential.credential);
                 cred = mapper.apply(credential);
             }
-
         } catch (final LastErrorException e) {
             logger.error("Getting secret failed. {}", e.getMessage());
         } finally {
@@ -163,8 +165,10 @@ public abstract class CredManagerBackedSecureStore<E extends StoredSecret> imple
             logger.error("Adding secret failed. {}", e.getMessage());
             return false;
         } finally {
-            cred.CredentialBlob.clear(credBlob.length);
-            Arrays.fill(credBlob, (byte) 0);
+            if (credBlob.length > 0) {
+                cred.CredentialBlob.clear(credBlob.length);
+                Arrays.fill(credBlob, (byte) 0);
+            }
         }
     }
 
@@ -188,7 +192,9 @@ public abstract class CredManagerBackedSecureStore<E extends StoredSecret> imple
 
 
         credential.CredentialBlobSize = credentialBlob.length;
-        credential.CredentialBlob = getPointer(credentialBlob);
+        if (credentialBlob.length > 0) {
+            credential.CredentialBlob = getPointer(credentialBlob);
+        }
 
         credential.Persist = CredAdvapi32.CRED_PERSIST_LOCAL_MACHINE;
         credential.UserName = username;
