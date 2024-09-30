@@ -78,13 +78,15 @@ public class StoredCredentialApp {
         // Request password from user.
         // Using API which returns char[] to avoid creating String
         // to minimize memory footprint for secure purposes.
-        final char[] password = System.console().readPassword("Enter password: ");
-
-        final StoredCredential credential = new StoredCredential(userName, password);
-
-        // Password value is not needed anymore, clear it now without waiting GC to remove it.
-        Arrays.fill(password, (char) 0x00);
-
-        return credential;
+        char[] password = null;
+        try {
+            password = System.console().readPassword("Enter password: ");
+            return new StoredCredential(userName, password);
+        } finally {
+            // Password value is not needed anymore, clear it now without waiting GC to remove it.
+            if (password != null) {
+                Arrays.fill(password, (char) 0x00);
+            }
+        }
     }
 }
