@@ -1,3 +1,5 @@
+The latest team who resurected this code base no longer exist, archiving this repo until needed again.
+
 # Credential Secure Storage for Java 
 Unified interface to store Java application secrets on different platforms backed by built-in credential managers.
 
